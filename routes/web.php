@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\JadwalController;
+use App\Http\Controllers\DosenController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,10 +21,22 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
+// Dashboard
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Jadwal Tugas Akhir
+Route::get('/jadwal', [JadwalController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('jadwal');
+
+// Data Dosen
+Route::get('/dosen', [DosenController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dosen');
+
+// Profile
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
