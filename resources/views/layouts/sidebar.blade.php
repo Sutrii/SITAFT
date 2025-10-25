@@ -51,15 +51,37 @@
             Data Skripsi Mahasiswa
         </a>
 
-        <a href="{{ route('dosen') }}"
+        <a href="{{ route('jadwal-dosen') }}"
             class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
-            {{ request()->routeIs('dosen') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
+            {{ request()->routeIs('jadwal-dosen') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 14.25c3.728 0 6.75 3.022 6.75 6.75H5.25c0-3.728 3.022-6.75 6.75-6.75zm0-9a3 3 0 100 6 3 3 0 000-6z" />
+            </svg>
+            Jadwal Dosen
+        </a>
+
+        <a href="{{ route('data-dosen') }}"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
+            {{ request()->routeIs('data-dosen') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                 stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M12 14.25c3.728 0 6.75 3.022 6.75 6.75H5.25c0-3.728 3.022-6.75 6.75-6.75zm0-9a3 3 0 100 6 3 3 0 000-6z" />
             </svg>
             Data Dosen
+        </a>
+
+        <a href="{{ route('mahasiswa') }}"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
+            {{ request()->routeIs('mahasiswa') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 14.25c3.728 0 6.75 3.022 6.75 6.75H5.25c0-3.728 3.022-6.75 6.75-6.75zm0-9a3 3 0 100 6 3 3 0 000-6z" />
+            </svg>
+            Data Mahasiswa
         </a>
     </nav>
 

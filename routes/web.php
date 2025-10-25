@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JadwalController;
-use App\Http\Controllers\DosenController;
+use App\Http\Controllers\JadwalDosenController;
 use App\Http\Controllers\SkripsiController;
+use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\DosenController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -32,15 +34,25 @@ Route::get('/jadwal', [JadwalController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('jadwal');
 
-// Data Dosen
-Route::get('/dosen', [DosenController::class, 'index'])
+// Data Jadwal Dosen
+Route::get('/dosen', [JadwalDosenController::class, 'index'])
     ->middleware(['auth', 'verified'])
-    ->name('dosen');
+    ->name('jadwal-dosen');
 
 // Data Skripsi Mahasiswa
 Route::get('/skripsi', [App\Http\Controllers\SkripsiController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('skripsi');
+
+// Data Dosen
+Route::get('/data-dosen', [App\Http\Controllers\DosenController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('data-dosen');
+    
+// Data Mahasiswa
+Route::get('/mahasiswa', [MahasiswaController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('mahasiswa');
 
 // Profile
 Route::middleware('auth')->group(function () {
