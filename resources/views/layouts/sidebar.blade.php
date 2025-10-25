@@ -40,6 +40,17 @@
             Jadwal Tugas Akhir
         </a>
 
+        <a href="{{ route('skripsi') }}"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
+            {{ request()->routeIs('skripsi') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4.5 6.75h15m-15 3.75h15m-15 3.75h9.75M4.5 3.75h15a.75.75 0 01.75.75v15a.75.75 0 01-.75.75h-15a.75.75 0 01-.75-.75v-15a.75.75 0 01.75-.75z" />
+            </svg>
+            Data Skripsi Mahasiswa
+        </a>
+
         <a href="{{ route('dosen') }}"
             class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
             {{ request()->routeIs('dosen') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">

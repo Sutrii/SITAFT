@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\DosenController;
+use App\Http\Controllers\SkripsiController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -35,6 +36,11 @@ Route::get('/jadwal', [JadwalController::class, 'index'])
 Route::get('/dosen', [DosenController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dosen');
+
+// Data Skripsi Mahasiswa
+Route::get('/skripsi', [App\Http\Controllers\SkripsiController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('skripsi');
 
 // Profile
 Route::middleware('auth')->group(function () {

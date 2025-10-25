@@ -54,8 +54,8 @@
 </div>
 
 {{-- DataTable --}}
-<div class="bg-white rounded-2xl shadow-md p-6 overflow-x-auto"> {{-- ✅ Scroll horizontal di wrapper --}}
-    <table id="jadwalTable" class="display text-sm min-w-[900px]"> {{-- ✅ Min width agar scroll aktif --}}
+<div class="bg-white rounded-2xl shadow-md p-6 overflow-x-auto">
+    <table id="jadwalTable" class="display text-sm min-w-[900px]">
         <thead>
             <tr class="text-[#2d3a32] border-b border-[#e8f0e8]">
                 <th class="py-3 px-2 text-left">No</th>
@@ -163,7 +163,6 @@
 </script>
 
 <style>
-/* 🌿 Area atas tabel (dropdown & search bar sejajar) */
 .dataTables_length_wrapper,
 .dataTables_filter_wrapper {
     display: flex;
@@ -171,7 +170,6 @@
     gap: 1rem;
 }
 
-/* 🌿 Dropdown “Tampilkan n data” */
 .dataTables_length {
     font-size: 0.875rem;
     color: #2d3a32;
@@ -181,17 +179,17 @@
 .dataTables_length select {
     border: 1px solid #d8e4d8;
     border-radius: 8px;
-    padding: 8px 40px 8px 14px; /* 👉 tambahkan right padding lebih besar */
+    padding: 8px 40px 8px 14px;
     font-size: 0.875rem;
     background-color: #fff;
     color: #2d3a32;
     outline: none;
     cursor: pointer;
     transition: all 0.2s ease;
-    appearance: none; /* ✅ hilangkan style default browser */
+    appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg fill='none' stroke='%236b7d6f' stroke-width='1.5' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M8.25 9.75L12 13.5l3.75-3.75'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 8px center; /* ✅ posisi panah */
+    background-position: right 8px center;
     background-size: 14px;
 }
 
@@ -204,7 +202,6 @@
     box-shadow: 0 0 0 2px rgba(62, 167, 106, 0.2);
 }
 
-/* 🌿 Search bar */
 .dataTables_filter {
     margin: 0 !important;
 }
@@ -223,7 +220,6 @@
     width: 14rem !important;
 }
 
-/* 🌿 Responsif di layar kecil */
 @media (max-width: 640px) {
     .dataTables_length_wrapper,
     .dataTables_filter_wrapper {
