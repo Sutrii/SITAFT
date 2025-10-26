@@ -10,7 +10,6 @@ class DosenController extends Controller
 {
     public function index()
     {
-        // ambil data terbaru duluan
         $dosens = Dosen::orderBy('id', 'desc')->get();
         return view('dosen.index', compact('dosens'));
     }

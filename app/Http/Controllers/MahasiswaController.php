@@ -10,7 +10,6 @@ class MahasiswaController extends Controller
 {
     public function index()
     {
-        // ambil data terbaru duluan
         $mahasiswas = Mahasiswa::orderBy('id', 'desc')->get();
         return view('mahasiswa.index', compact('mahasiswas'));
     }

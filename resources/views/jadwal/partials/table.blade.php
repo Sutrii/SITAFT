@@ -91,7 +91,7 @@
     </div>
 </div>
 
-{{-- 🌟 Modal Tambah Data --}}
+{{-- Modal Tambah Data --}}
 <div id="addModal"
     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
     <div class="bg-white w-[450px] rounded-2xl shadow-lg overflow-hidden">
@@ -162,7 +162,7 @@
     </div>
 </div>
 
-{{-- 🌟 Modal Edit Data --}}
+{{-- Modal Edit Data --}}
 <div id="editModal"
     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
     <div class="bg-white w-[450px] rounded-2xl shadow-lg overflow-hidden">
@@ -270,7 +270,6 @@ $(document).ready(() => {
     });
 });
 
-// Modal Tambah
 const modal = document.getElementById('addModal');
 const openModalBtn = document.getElementById('openModalBtn');
 const closeModalBtn = document.getElementById('closeModalBtn');
@@ -278,7 +277,6 @@ openModalBtn.addEventListener('click', () => modal.classList.replace('hidden', '
 closeModalBtn.addEventListener('click', () => modal.classList.replace('flex', 'hidden'));
 modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.replace('flex', 'hidden'); });
 
-// Modal Edit
 const editModal = document.getElementById('editModal');
 const closeEditModalBtn = document.getElementById('closeEditModalBtn');
 const editForm = document.getElementById('editForm');
@@ -296,7 +294,6 @@ function openEditModal(id, mahasiswaId, skripsiId, dosen1, dosen2, waktu, status
         if (res.isConfirmed) {
             editModal.classList.replace('hidden', 'flex');
 
-            // isi semua field
             document.getElementById('editMahasiswa').value = mahasiswaId;
             document.getElementById('editSkripsi').value = skripsiId;
             document.getElementById('editDosen1').value = dosen1;
@@ -304,7 +301,6 @@ function openEditModal(id, mahasiswaId, skripsiId, dosen1, dosen2, waktu, status
             document.getElementById('editTanggal').value = waktu.replace(' ', 'T');
             document.getElementById('editStatus').value = status;
 
-            // set action form edit
             editForm.action = `/jadwal/${id}`;
         }
     });
@@ -312,7 +308,6 @@ function openEditModal(id, mahasiswaId, skripsiId, dosen1, dosen2, waktu, status
 
 closeEditModalBtn.addEventListener('click', () => editModal.classList.replace('flex', 'hidden'));
 
-// Konfirmasi Hapus
 function confirmDelete(url, nama) {
     Swal.fire({
         title: `Hapus jadwal ${nama}?`,
@@ -337,14 +332,12 @@ function confirmDelete(url, nama) {
 </script>
 
 <style>
-/* 🌿 Hanya tabel yang bisa di-scroll horizontal */
 .overflow-x-auto {
     width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
 }
 
-/* 🌿 Scrollbar yang halus & elegan */
 .overflow-x-auto::-webkit-scrollbar {
     height: 8px;
 }
@@ -356,7 +349,6 @@ function confirmDelete(url, nama) {
     background: #94a3b8;
 }
 
-/* 🌿 Sticky header untuk tabel panjang */
 #jadwalTable thead th {
     position: sticky;
     top: 0;
@@ -365,18 +357,15 @@ function confirmDelete(url, nama) {
     box-shadow: 0 1px 0 #e8f0e8;
 }
 
-/* Biar tabel gak ngelebar kanan */
 #jadwalTable {
     width: 100% !important;
     table-layout: auto !important;
 }
 
-/* Hilangin scroll horizontal */
 .dataTables_wrapper {
     overflow-x: hidden !important;
 }
 
-/* Rapiin kolom dan padding */
 #jadwalTable th,
 #jadwalTable td {
     white-space: nowrap;
@@ -384,12 +373,16 @@ function confirmDelete(url, nama) {
     text-align: left;
 }
 
-/* Warna zebra */
+#jadwalTable td:nth-child(3) {
+    white-space: normal !important;
+    word-break: break-word;
+    max-width: 300px; 
+}
+
 #jadwalTable tbody tr:nth-child(odd) { background-color: #fafdfa; }
 #jadwalTable tbody tr:nth-child(even) { background-color: #ffffff; }
 #jadwalTable tbody tr:hover { background-color: #f1f8f4; }
 
-/* Style filter dan dropdown */
 .dataTables_length select {
     border: 1px solid #d8e4d8;
     border-radius: 8px;

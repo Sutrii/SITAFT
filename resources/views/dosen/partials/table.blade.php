@@ -77,7 +77,7 @@
     </table>
 </div>
 
-{{-- 🌟 Modal Tambah Data --}}
+{{-- Modal Tambah Data --}}
 <div id="addModal"
     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
     <div class="bg-white w-[400px] rounded-2xl shadow-lg overflow-hidden">
@@ -118,7 +118,7 @@
     </div>
 </div>
 
-{{-- 🌟 Modal Edit Data --}}
+{{-- Modal Edit Data --}}
 <div id="editModal"
     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
     <div class="bg-white w-[400px] rounded-2xl shadow-lg overflow-hidden">
@@ -211,7 +211,6 @@ $(document).ready(function () {
     });
 });
 
-// ✅ SweetAlert Notifikasi
 @if (session('success'))
 Swal.fire({
     icon: 'success',
@@ -230,7 +229,6 @@ Swal.fire({
 });
 @endif
 
-// ✅ Modal Edit
 const editModal = document.getElementById('editModal');
 const closeEditModalBtn = document.getElementById('closeEditModalBtn');
 const editForm = document.getElementById('editForm');
@@ -280,7 +278,6 @@ editForm?.addEventListener('submit', (e) => {
     setTimeout(() => e.target.submit(), 700);
 });
 
-// ✅ Konfirmasi Hapus
 function confirmDelete(actionUrl, nik) {
     Swal.fire({
         title: `Hapus Dosen ${nik}?`,

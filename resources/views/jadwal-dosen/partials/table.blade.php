@@ -103,7 +103,7 @@
     </table>
 </div>
 
-{{-- 🌟 Modal Tambah Data --}}
+{{-- Modal Tambah Data --}}
 <div id="addModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
     <div class="bg-white w-[400px] rounded-2xl shadow-lg overflow-hidden">
         <div class="bg-gradient-to-r from-green-500 to-green-700 text-white px-5 py-3 font-semibold text-lg">
@@ -160,7 +160,7 @@
     </div>
 </div>
 
-{{-- 🌟 Modal Edit --}}
+{{-- Modal Edit --}}
 <div id="editModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
     <div class="bg-white w-[400px] rounded-2xl shadow-lg overflow-hidden">
         <div class="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-5 py-3 font-semibold text-lg">
@@ -243,7 +243,6 @@ $(document).ready(function () {
     });
 });
 
-// ✅ SweetAlert Notifikasi
 @if (session('success'))
 Swal.fire({ icon: 'success', title: 'Berhasil!', text: '{{ session('success') }}', showConfirmButton: false, timer: 1800 });
 @endif
@@ -251,7 +250,6 @@ Swal.fire({ icon: 'success', title: 'Berhasil!', text: '{{ session('success') }}
 Swal.fire({ icon: 'error', title: 'Gagal!', text: '{{ session('error') }}' });
 @endif
 
-// ✅ Modal Edit
 const editModal = document.getElementById('editModal');
 const closeEditModalBtn = document.getElementById('closeEditModalBtn');
 const editForm = document.getElementById('editForm');
@@ -280,7 +278,6 @@ function openEditModal(id, userId, hari, jam, status) {
 closeEditModalBtn.addEventListener('click', () => editModal.classList.replace('flex', 'hidden'));
 editModal.addEventListener('click', (e) => { if (e.target === editModal) editModal.classList.replace('flex', 'hidden'); });
 
-// ✅ Hapus
 function confirmDelete(actionUrl, dosen) {
     Swal.fire({
         title: `Hapus jadwal ${dosen}?`,
