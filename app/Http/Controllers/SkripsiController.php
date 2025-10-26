@@ -10,7 +10,6 @@ class SkripsiController extends Controller
 {
     public function index()
     {
-        // ambil data terbaru duluan
         $skripsis = Skripsi::orderBy('id', 'desc')->get();
         return view('skripsi.index', compact('skripsis'));
     }
