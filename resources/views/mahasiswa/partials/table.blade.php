@@ -1,31 +1,27 @@
 {{-- Header & Tombol Tambah --}}
 <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-semibold text-[#2d3a32]">Data Mahasiswa</h2>
-    <div class="flex items-center gap-3">
-        <button
-            class="border border-[#3ea76a] text-[#3ea76a] hover:bg-[#e5f5e8] px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-all">
-            + Tambah Data
-        </button>
-    </div>
+
+    {{-- Tombol buka modal --}}
+    <button id="openModalBtn"
+        class="bg-[#3ea76a] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#2d8c5d] transition">
+        + Tambah Data
+    </button>
 </div>
 
 {{-- Filter Bar --}}
 <div class="bg-white rounded-2xl shadow-sm p-5 mb-6">
     <div class="grid grid-cols-3 gap-4 items-end w-full">
-        {{-- Kolom 1 - Nama Mahasiswa --}}
         <div class="w-full">
             <label class="block text-sm font-medium text-[#2d3a32] mb-1">Nama Mahasiswa</label>
             <input type="text" id="filterNama" placeholder="Cari nama mahasiswa..."
-                class="w-full border border-[#d8e4d8] rounded-lg px-3 py-2 text-sm
-                       focus:ring-2 focus:ring-[#3ea76a] focus:outline-none" />
+                class="w-full border border-[#d8e4d8] rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#3ea76a] focus:outline-none" />
         </div>
 
-        {{-- Kolom 2 - NIM --}}
         <div class="w-full">
             <label class="block text-sm font-medium text-[#2d3a32] mb-1">NIM</label>
             <input type="text" id="filterNim" placeholder="Cari NIM..."
-                class="w-full border border-[#d8e4d8] rounded-lg px-3 py-2 text-sm
-                       focus:ring-2 focus:ring-[#3ea76a] focus:outline-none" />
+                class="w-full border border-[#d8e4d8] rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#3ea76a] focus:outline-none" />
         </div>
     </div>
 </div>
@@ -43,60 +39,136 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>1</td>
-                <td>Riyanda Ilham</td>
-                <td>2105012345</td>
-                <td>2024-09-10</td>
-                <td class="text-center flex justify-center gap-2">
-                    <button class="text-[#3ea76a] hover:text-[#2d3a32] transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M16.862 4.487l1.687 1.688m-2.122-2.122a1.5 1.5 0 112.122 2.122L7.5 17.25H4.5v-3l11.928-11.928z" />
-                        </svg>
-                    </button>
-                    <button class="text-red-500 hover:text-red-700 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Andi Saputra</td>
-                <td>2105012346</td>
-                <td>2024-10-22</td>
-                <td class="text-center flex justify-center gap-2">
-                    <button class="text-[#3ea76a] hover:text-[#2d3a32] transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M16.862 4.487l1.687 1.688m-2.122-2.122a1.5 1.5 0 112.122 2.122L7.5 17.25H4.5v-3l11.928-11.928z" />
-                        </svg>
-                    </button>
-                    <button class="text-red-500 hover:text-red-700 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </td>
-            </tr>
+            @forelse ($mahasiswas as $index => $mhs)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $mhs->name }}</td>
+                    <td>{{ $mhs->nim }}</td>
+                    <td>{{ $mhs->created_at?->format('d M Y') ?? '-' }}</td>
+                    <td class="text-center">
+                        <div class="flex justify-center gap-3">
+                            {{-- Tombol Edit --}}
+                            <button type="button" class="text-blue-500 hover:text-blue-700 transition"
+                                onclick="openEditModal('{{ $mhs->id }}', '{{ $mhs->name }}', '{{ $mhs->nim }}')">
+                                ✏️
+                            </button>
+
+                            {{-- Tombol Hapus --}}
+                            <button type="button" class="text-red-500 hover:text-red-700 transition"
+                                onclick="confirmDelete('{{ route('mahasiswa.destroy', $mhs->id) }}', '{{ $mhs->name }}')">
+                                🗑️
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td class="text-center text-gray-500">Tidak ada data ditemukan</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
+</div>
+
+{{-- 🌟 Modal Tambah Data --}}
+<div id="addModal"
+    class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+    <div class="bg-white w-[400px] rounded-2xl shadow-lg overflow-hidden">
+        {{-- Ribbon Header --}}
+        <div class="bg-gradient-to-r from-green-500 to-green-700 text-white px-5 py-3 font-semibold text-lg">
+            Tambah Mahasiswa
+        </div>
+
+        {{-- Form --}}
+        <form action="{{ route('mahasiswa.store') }}" method="POST" class="p-5 space-y-4">
+            @csrf
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Mahasiswa</label>
+                <input type="text" name="name" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">NIM</label>
+                <input type="text" name="nim" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400">
+            </div>
+
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button" id="closeModalBtn"
+                    class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition">Batal</button>
+                <button type="submit"
+                    class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- 🌟 Modal Edit Data --}}
+<div id="editModal"
+    class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+    <div class="bg-white w-[400px] rounded-2xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-5 py-3 font-semibold text-lg">
+            Edit Mahasiswa
+        </div>
+
+        <form id="editForm" method="POST" class="p-5 space-y-4">
+            @csrf
+            @method('PUT')
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Mahasiswa</label>
+                <input type="text" name="name" id="editName" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">NIM</label>
+                <input type="text" name="nim" id="editNim" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+            </div>
+
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button" id="closeEditModalBtn"
+                    class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition">Batal</button>
+                <button type="submit"
+                    class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">Update</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 {{-- Scripts --}}
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+const modal = document.getElementById('addModal');
+const openModalBtn = document.getElementById('openModalBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+
+openModalBtn.addEventListener('click', () => {
+    modal.classList.remove('hidden', 'opacity-0');
+    modal.classList.add('flex');
+});
+
+closeModalBtn.addEventListener('click', () => {
+    modal.classList.add('hidden', 'opacity-0');
+    modal.classList.remove('flex');
+});
+
+modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        modal.classList.add('hidden', 'opacity-0');
+        modal.classList.remove('flex');
+    }
+});
+
 $(document).ready(function () {
     const table = $('#mahasiswaTable').DataTable({
         scrollX: false,
@@ -124,7 +196,6 @@ $(document).ready(function () {
         ]
     });
 
-    // Filter manual via input
     $('#filterNama').on('keyup', function () {
         table.column(1).search(this.value).draw();
     });
@@ -132,13 +203,123 @@ $(document).ready(function () {
         table.column(2).search(this.value).draw();
     });
 
-    // Reset filter
     $('#resetFilter').on('click', function () {
         $('#filterNama').val('');
         $('#filterNim').val('');
         table.columns().search('').draw();
     });
 });
+
+
+// ===================== SWEETALERT NOTIFIKASI =====================
+
+// ✅ Notifikasi sukses tambah / edit / hapus
+@if (session('success'))
+Swal.fire({
+    icon: 'success',
+    title: 'Berhasil!',
+    text: '{{ session('success') }}',
+    showConfirmButton: false,
+    timer: 1800
+});
+@endif
+
+@if (session('error'))
+Swal.fire({
+    icon: 'error',
+    title: 'Gagal!',
+    text: '{{ session('error') }}',
+});
+@endif
+
+
+// ===================== MODAL EDIT =====================
+const editModal = document.getElementById('editModal');
+const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+const editForm = document.getElementById('editForm');
+
+function openEditModal(id, name, nim) {
+    Swal.fire({
+        title: `Edit ${name}?`,
+        text: "Apakah Anda yakin ingin mengubah data ini?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, ubah',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            editModal.classList.remove('hidden', 'opacity-0');
+            editModal.classList.add('flex');
+            document.getElementById('editName').value = name;
+            document.getElementById('editNim').value = nim;
+            editForm.action = `/mahasiswa/${id}`;
+        }
+    });
+}
+
+closeEditModalBtn?.addEventListener('click', () => {
+    editModal.classList.add('hidden', 'opacity-0');
+    editModal.classList.remove('flex');
+});
+
+editModal?.addEventListener('click', (e) => {
+    if (e.target === editModal) {
+        editModal.classList.add('hidden', 'opacity-0');
+        editModal.classList.remove('flex');
+    }
+});
+
+// ✅ Tambah konfirmasi submit edit + animasi loading
+editForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    Swal.fire({
+        title: 'Menyimpan...',
+        text: 'Mohon tunggu, sedang memperbarui data',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+    });
+
+    setTimeout(() => {
+        e.target.submit();
+    }, 700);
+});
+
+
+// ===================== KONFIRMASI HAPUS =====================
+function confirmDelete(actionUrl, name) {
+    Swal.fire({
+        title: `Hapus ${name}?`,
+        text: "Data ini tidak bisa dikembalikan!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e3342f',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Menghapus...',
+                text: 'Sedang menghapus data',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading(),
+            });
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = actionUrl;
+            form.innerHTML = `
+                @csrf
+                @method('DELETE')
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
 </script>
 
 <style>
