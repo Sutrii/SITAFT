@@ -51,7 +51,7 @@
                         <div class="flex justify-center gap-3">
                             {{-- Tombol Edit --}}
                             <button type="button" class="text-blue-500 hover:text-blue-700 transition"
-                                onclick="openEditModal('{{ $skripsi->id }}', '{{ $skripsi->nama_mahasiswa }}', '{{ $skripsi->judul_skripsi }}', '{{ $skripsi->bidang }}')">
+                            onclick="openEditModal('{{ $skripsi->id }}', '{{ $skripsi->nama_mahasiswa }}', '{{ $skripsi->judul_skripsi }}', '{{ $skripsi->bidang }}')">
                                 ✏️
                             </button>
 
@@ -88,8 +88,13 @@
             @csrf
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Mahasiswa</label>
-                <input type="text" name="nama_mahasiswa" required
+                <select name="nama_mahasiswa" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400">
+                    <option value="">-- Pilih Mahasiswa --</option>
+                    @foreach ($mahasiswas as $m)
+                        <option value="{{ $m->name }}">{{ $m->name }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <div>
@@ -127,8 +132,13 @@
             @method('PUT')
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Mahasiswa</label>
-                <input type="text" name="nama_mahasiswa" id="editNama" required
+                <select name="nama_mahasiswa" id="editNama" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                    <option value="">-- Pilih Mahasiswa --</option>
+                    @foreach ($mahasiswas as $m)
+                        <option value="{{ $m->name }}">{{ $m->name }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <div>
@@ -224,12 +234,11 @@ Swal.fire({
 });
 @endif
 
-// ✅ Modal Edit
 const editModal = document.getElementById('editModal');
 const closeEditModalBtn = document.getElementById('closeEditModalBtn');
 const editForm = document.getElementById('editForm');
 
-function openEditModal(id, judul, bidang) {
+function openEditModal(id, namaMahasiswa, judul, bidang) {
     Swal.fire({
         title: `Edit "${judul}"?`,
         text: "Apakah Anda yakin ingin mengubah data ini?",
@@ -243,6 +252,8 @@ function openEditModal(id, judul, bidang) {
         if (result.isConfirmed) {
             editModal.classList.remove('hidden', 'opacity-0');
             editModal.classList.add('flex');
+
+            document.getElementById('editNama').value = namaMahasiswa;
             document.getElementById('editJudul').value = judul;
             document.getElementById('editBidang').value = bidang;
             editForm.action = `/skripsi/${id}`;
@@ -312,4 +323,18 @@ function confirmDelete(actionUrl, judul) {
 #skripsiTable tbody tr:hover { background-color: #f1f8f4; }
 table.dataTable.no-footer { border-bottom: none; }
 table.dataTable tbody td, table.dataTable thead th { padding: 0.75rem 1rem !important; }
+/* Search Bar DataTables */
+.dataTables_filter input {
+    border: 1px solid #d8e4d8 !important;
+    border-radius: 9999px !important;
+    padding: 0.5rem 1rem 0.5rem 2.5rem !important;
+    font-size: 0.875rem;
+    color: #2d3a32;
+    background-color: #ffffff;
+    background-image: url('data:image/svg+xml,%3Csvg fill="none" stroke="%236b7d6f" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z"/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: 0.75rem center;
+    background-size: 1rem;
+    width: 14rem !important;
+}
 </style>

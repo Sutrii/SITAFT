@@ -316,4 +316,18 @@ function confirmDelete(actionUrl, nik) {
 #dosenTable tbody tr:hover { background-color: #f1f8f4; }
 table.dataTable.no-footer { border-bottom: none; }
 table.dataTable tbody td, table.dataTable thead th { padding: 0.75rem 1rem !important; }
+/* Search Bar DataTables */
+.dataTables_filter input {
+    border: 1px solid #d8e4d8 !important;
+    border-radius: 9999px !important;
+    padding: 0.5rem 1rem 0.5rem 2.5rem !important;
+    font-size: 0.875rem;
+    color: #2d3a32;
+    background-color: #ffffff;
+    background-image: url('data:image/svg+xml,%3Csvg fill="none" stroke="%236b7d6f" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z"/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: 0.75rem center;
+    background-size: 1rem;
+    width: 14rem !important;
+}
 </style>

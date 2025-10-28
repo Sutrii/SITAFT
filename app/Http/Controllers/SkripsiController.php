@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Skripsi;
+use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,7 +12,8 @@ class SkripsiController extends Controller
     public function index()
     {
         $skripsis = Skripsi::orderBy('id', 'desc')->get();
-        return view('skripsi.index', compact('skripsis'));
+        $mahasiswas = Mahasiswa::orderBy('name')->get();
+        return view('skripsi.index', compact('skripsis', 'mahasiswas'));
     }
 
     public function store(Request $request)
