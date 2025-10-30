@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\JadwalDosenController;
@@ -25,9 +26,21 @@ Route::get('/', function () {
 });
 
 // Dashboard
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/month/{month}', [DashboardController::class, 'fetchMonth']);
+    Route::get('/dashboard/data/{month}/{day?}', [DashboardController::class, 'fetchData']);
+
+    Route::get('/dashboard/data-today', function () {
+        $today = \Carbon\Carbon::now()->locale('id')->isoFormat('dddd');
+        $data = \App\Models\JadwalDosen::with('dosen')
+            ->whereRaw('LOWER(hari) = ?', strtolower($today))
+            ->where('status', 'Kosong')
+            ->get()
+            ->groupBy('userId');
+        return response()->json($data);
+    });
+});
 
 // Jadwal Tugas Akhir
 Route::middleware(['auth', 'verified'])->group(function () {
