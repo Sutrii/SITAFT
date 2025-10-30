@@ -22,8 +22,14 @@ class DosenController extends Controller
             'bidang' => 'required|string|max:255',
         ]);
 
+        $user = \App\Models\User::whereRaw('LOWER(TRIM(name)) = ?', [strtolower(trim($request->name))])->first();
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'User untuk dosen ini belum ada di tabel users!');
+        }
+
         Dosen::create([
-            'userId' => Auth::id(),
+            'userId' => $user->id,
             'name'   => $request->name,
             'nik'    => $request->nik,
             'bidang' => $request->bidang,
@@ -31,6 +37,7 @@ class DosenController extends Controller
 
         return redirect()->back()->with('success', 'Dosen berhasil ditambahkan!');
     }
+
 
     public function update(Request $request, Dosen $dosen)
     {

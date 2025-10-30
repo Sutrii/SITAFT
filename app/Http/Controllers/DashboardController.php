@@ -11,12 +11,12 @@ class DashboardController extends Controller
     public function index($month = null)
     {
         $month = $month ?? Carbon::now()->month;
-
         $today = Carbon::now()->locale('id')->isoFormat('dddd');
+        $todayLower = strtolower($today);
         $currentMonth = Carbon::createFromDate(null, $month)->translatedFormat('F Y');
 
         $dosenKosong = JadwalDosen::with('dosen')
-            ->where('hari', $today)
+            ->whereRaw('LOWER(TRIM(hari)) = LOWER(TRIM(?))', [$today])
             ->where('status', 'Kosong')
             ->get()
             ->groupBy('userId');
@@ -26,9 +26,9 @@ class DashboardController extends Controller
             ->orderBy('jadwal_seminar', 'asc')
             ->get();
 
-        $eventDays = $jadwalSeminar->mapWithKeys(function ($j) {
-            return [Carbon::parse($j->jadwal_seminar)->day => $j->status];
-        });
+        $eventDays = $jadwalSeminar->mapWithKeys(fn($j) => [
+            Carbon::parse($j->jadwal_seminar)->day => $j->status
+        ]);
 
         return view('dashboard.index', compact('dosenKosong', 'jadwalSeminar', 'eventDays', 'currentMonth'));
     }
@@ -46,9 +46,10 @@ class DashboardController extends Controller
     public function fetchData($month, $day = null)
     {
         $day = $day ?? Carbon::now()->locale('id')->isoFormat('dddd');
+        $dayLower = strtolower($day);
 
         $dosenKosong = JadwalDosen::with('dosen')
-            ->whereRaw('LOWER(hari) = ?', strtolower($day))
+            ->whereRaw('LOWER(TRIM(hari)) = LOWER(TRIM(?))', [$today])
             ->where('status', 'Kosong')
             ->get()
             ->groupBy('userId');
