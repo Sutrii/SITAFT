@@ -148,6 +148,27 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+const addModal = document.getElementById('addModal');
+const openModalBtn = document.getElementById('openModalBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+
+openModalBtn.addEventListener('click', () => {
+    addModal.classList.remove('hidden', 'opacity-0');
+    addModal.classList.add('flex');
+});
+
+closeModalBtn.addEventListener('click', () => {
+    addModal.classList.add('hidden', 'opacity-0');
+    addModal.classList.remove('flex');
+});
+
+addModal.addEventListener('click', (e) => {
+    if (e.target === addModal) {
+        addModal.classList.add('hidden', 'opacity-0');
+        addModal.classList.remove('flex');
+    }
+});
+
 $(document).ready(function () {
     const table = $('#jadwalTable').DataTable({
         pageLength: 5,
@@ -173,6 +194,121 @@ $(document).ready(function () {
         table.draw();
     });
 });
+
+const editModal = document.getElementById('editModal');
+const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+const editForm = document.getElementById('editForm');
+
+function openEditModal(id, userId, hari, jam, status) {
+    Swal.fire({
+        title: 'Edit Jadwal?',
+        text: "Apakah Anda yakin ingin mengubah jadwal ini?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, ubah',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            editModal.classList.remove('hidden', 'opacity-0');
+            editModal.classList.add('flex');
+
+            document.querySelector('#editForm select[name="userId"]').value = userId;
+            document.querySelector('#editForm select[name="hari"]').value = hari;
+            document.querySelector('#editForm select[name="jam"]').value = jam;
+            document.querySelector('#editForm select[name="status"]').value = status;
+
+            editForm.action = `/jadwal-dosen/${id}`;
+        }
+    });
+}
+
+closeEditModalBtn?.addEventListener('click', () => {
+    editModal.classList.add('hidden', 'opacity-0');
+    editModal.classList.remove('flex');
+});
+
+editModal?.addEventListener('click', (e) => {
+    if (e.target === editModal) {
+        editModal.classList.add('hidden', 'opacity-0');
+        editModal.classList.remove('flex');
+    }
+});
+
+editForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    Swal.fire({
+        title: 'Menyimpan...',
+        text: 'Mohon tunggu, sedang memperbarui jadwal',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+    });
+
+    setTimeout(() => {
+        e.target.submit();
+    }, 700);
+});
+
+function confirmDelete(actionUrl, dosenName) {
+    Swal.fire({
+        title: `Hapus jadwal ${dosenName}?`,
+        text: "Data jadwal ini akan dihapus permanen.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e3342f',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Menghapus...',
+                text: 'Sedang menghapus data jadwal',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading(),
+            });
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = actionUrl;
+            form.innerHTML = `
+                @csrf
+                @method('DELETE')
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+
+@if (session('success'))
+Swal.fire({
+    icon: 'success',
+    title: 'Berhasil!',
+    text: '{{ session('success') }}',
+    showConfirmButton: false,
+    timer: 1800
+});
+@endif
+
+@if (session('error'))
+Swal.fire({
+    icon: 'error',
+    title: 'Gagal!',
+    text: '{{ session('error') }}',
+});
+@endif
+
+@if ($errors->any())
+Swal.fire({
+    icon: 'warning',
+    title: 'Validasi Gagal!',
+    html: `{!! implode('<br>', $errors->all()) !!}`,
+    confirmButtonText: 'Oke'
+});
+@endif
 </script>
 
 <style>

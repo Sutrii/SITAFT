@@ -63,4 +63,14 @@ class JadwalController extends Controller
             return redirect()->back()->with('error', 'Gagal menghapus jadwal!');
         }
     }
+
+    public function sharedView($title, $from, $to)
+    {
+        $jadwals = \App\Models\Jadwal::with(['mahasiswa', 'skripsi', 'dosen1', 'dosen2'])
+            ->whereBetween('jadwal_seminar', [$from, $to])
+            ->orderBy('jadwal_seminar', 'asc')
+            ->get();
+
+        return view('jadwal.shared', compact('jadwals', 'title', 'from', 'to'));
+    }
 }

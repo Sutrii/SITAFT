@@ -204,14 +204,38 @@
     </div>
 </div>
 
+<!-- CDN -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+const addModal = document.getElementById('addModal');
+const openModalBtn = document.getElementById('openModalBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+
+openModalBtn.addEventListener('click', () => {
+    addModal.classList.remove('hidden', 'opacity-0');
+    addModal.classList.add('flex');
+});
+
+closeModalBtn.addEventListener('click', () => {
+    addModal.classList.add('hidden', 'opacity-0');
+    addModal.classList.remove('flex');
+});
+
+addModal.addEventListener('click', (e) => {
+    if (e.target === addModal) {
+        addModal.classList.add('hidden', 'opacity-0');
+        addModal.classList.remove('flex');
+    }
+});
+
 $(document).ready(function () {
     const table = $('#usersTable').DataTable({
+        scrollX: false,
+        autoWidth: false,
         pageLength: 5,
         lengthChange: true,
         lengthMenu: [5, 10, 25, 50, 100],
@@ -240,11 +264,132 @@ $(document).ready(function () {
     $('#filterNama').on('keyup', function () {
         table.column(1).search(this.value).draw();
     });
-
     $('#filterPosisi').on('change', function () {
         table.column(5).search(this.value).draw();
     });
 });
+
+function toggleEmailPassword(type, value) {
+    const section = document.getElementById(
+        type === 'add' ? 'emailPasswordAdd' : 'emailPasswordEdit'
+    );
+    if (value === '1') section.classList.remove('hidden');
+    else section.classList.add('hidden');
+}
+
+const editModal = document.getElementById('editModal');
+const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+const editForm = document.getElementById('editForm');
+
+function openEditModal(id, name, email, roleId, positionId) {
+    Swal.fire({
+        title: `Edit ${name}?`,
+        text: "Apakah Anda yakin ingin mengubah data ini?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, ubah',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            editModal.classList.remove('hidden', 'opacity-0');
+            editModal.classList.add('flex');
+            document.getElementById('editName').value = name;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editRole').value = roleId;
+            document.getElementById('editPosition').value = positionId;
+            toggleEmailPassword('edit', positionId);
+            editForm.action = `/users/${id}`;
+        }
+    });
+}
+
+closeEditModalBtn?.addEventListener('click', () => {
+    editModal.classList.add('hidden', 'opacity-0');
+    editModal.classList.remove('flex');
+});
+
+editModal?.addEventListener('click', (e) => {
+    if (e.target === editModal) {
+        editModal.classList.add('hidden', 'opacity-0');
+        editModal.classList.remove('flex');
+    }
+});
+
+editForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    Swal.fire({
+        title: 'Menyimpan...',
+        text: 'Mohon tunggu, sedang memperbarui data',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+    });
+
+    setTimeout(() => {
+        e.target.submit();
+    }, 700);
+});
+
+function confirmDelete(actionUrl, name) {
+    Swal.fire({
+        title: `Hapus ${name}?`,
+        text: "Data ini tidak bisa dikembalikan!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e3342f',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Menghapus...',
+                text: 'Sedang menghapus data',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading(),
+            });
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = actionUrl;
+            form.innerHTML = `
+                @csrf
+                @method('DELETE')
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+
+@if (session('success'))
+Swal.fire({
+    icon: 'success',
+    title: 'Berhasil!',
+    text: '{{ session('success') }}',
+    showConfirmButton: false,
+    timer: 1800
+});
+@endif
+
+@if (session('error'))
+Swal.fire({
+    icon: 'error',
+    title: 'Gagal!',
+    text: '{{ session('error') }}',
+});
+@endif
+
+@if ($errors->any())
+Swal.fire({
+    icon: 'warning',
+    title: 'Validasi Gagal!',
+    html: `{!! implode('<br>', $errors->all()) !!}`,
+    confirmButtonText: 'Oke'
+});
+@endif
 </script>
 
 <style>

@@ -243,6 +243,25 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+const addModal = document.getElementById('addModal');
+const openModalBtn = document.getElementById('openModalBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+
+openModalBtn.addEventListener('click', () => {
+    addModal.classList.remove('hidden', 'opacity-0');
+    addModal.classList.add('flex');
+});
+closeModalBtn.addEventListener('click', () => {
+    addModal.classList.add('hidden', 'opacity-0');
+    addModal.classList.remove('flex');
+});
+addModal.addEventListener('click', (e) => {
+    if (e.target === addModal) {
+        addModal.classList.add('hidden', 'opacity-0');
+        addModal.classList.remove('flex');
+    }
+});
+
 $(document).ready(() => {
     const table = $('#jadwalTable').DataTable({
         pageLength: 5,
@@ -264,34 +283,129 @@ $(document).ready(() => {
     $('#filterNama').on('keyup', function () {
         table.column(1).search(this.value).draw();
     });
-
     $('#filterStatus').on('change', function () {
         table.column(7).search(this.value).draw();
     });
 
-    // 🔗 Tombol Share Link
-    $('#shareLinkBtn').on('click', () => {
-        const link = window.location.href;
-        navigator.clipboard.writeText(link).then(() => {
+    $('#shareLinkBtn').on('click', function () {
+        const visibleData = table.rows({ filter: 'applied' }).data().toArray();
+        if (visibleData.length === 0) {
+            Swal.fire('Oops!', 'Tidak ada data yang ditampilkan di tabel.', 'info');
+            return;
+        }
+
+        const tanggalList = visibleData.map(row => row[5]);
+        const sortedTanggal = tanggalList.sort((a, b) => new Date(a) - new Date(b));
+        const from = sortedTanggal[0];
+        const to = sortedTanggal[sortedTanggal.length - 1];
+        const title = 'Jadwal-Seminar-Tugas-Akhir-Mahasiswa';
+        const url = `${window.location.origin}/jadwal/share/${title}-${from}-sampai-${to}`;
+
+        navigator.clipboard.writeText(url).then(() => {
             Swal.fire({
                 icon: 'success',
-                title: 'Link disalin!',
-                text: 'URL halaman ini telah disalin ke clipboard.',
-                timer: 1800,
-                showConfirmButton: false
+                title: 'Link Dibagikan!',
+                html: `URL disalin ke clipboard:<br><a href="${url}" target="_blank" class="text-green-600 underline">${url}</a>`,
+                showConfirmButton: false,
+                timer: 3000
             });
-        }).catch(() => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal menyalin!',
-                text: 'Browser kamu tidak mendukung fitur salin otomatis.',
-                timer: 2000,
-                showConfirmButton: false
-            });
-        });
+        }).catch(() => Swal.fire('Error', 'Gagal menyalin link!', 'error'));
     });
-
 });
+
+const editModal = document.getElementById('editModal');
+const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+const editForm = document.getElementById('editForm');
+
+function openEditModal(id, mahasiswaId, skripsiId, dosen1, dosen2, jadwal, status) {
+    Swal.fire({
+        title: 'Edit Jadwal?',
+        text: 'Apakah Anda yakin ingin mengubah jadwal ini?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, ubah',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            editModal.classList.remove('hidden', 'opacity-0');
+            editModal.classList.add('flex');
+
+            document.getElementById('editMahasiswa').value = mahasiswaId;
+            document.getElementById('editSkripsi').value = skripsiId;
+            document.getElementById('editDosen1').value = dosen1;
+            document.getElementById('editDosen2').value = dosen2;
+            document.getElementById('editTanggal').value = jadwal;
+            document.getElementById('editStatus').value = status;
+
+            editForm.action = `/jadwal/${id}`;
+        }
+    });
+}
+
+closeEditModalBtn?.addEventListener('click', () => {
+    editModal.classList.add('hidden', 'opacity-0');
+    editModal.classList.remove('flex');
+});
+editModal?.addEventListener('click', (e) => {
+    if (e.target === editModal) {
+        editModal.classList.add('hidden', 'opacity-0');
+        editModal.classList.remove('flex');
+    }
+});
+
+editForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    Swal.fire({
+        title: 'Menyimpan...',
+        text: 'Sedang memperbarui jadwal...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+    setTimeout(() => e.target.submit(), 700);
+});
+
+function confirmDelete(actionUrl, name) {
+    Swal.fire({
+        title: `Hapus jadwal ${name}?`,
+        text: 'Data ini tidak bisa dikembalikan!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e3342f',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Menghapus...',
+                text: 'Sedang menghapus data',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = actionUrl;
+            form.innerHTML = `@csrf @method('DELETE')`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+
+@if (session('success'))
+Swal.fire({ icon: 'success', title: 'Berhasil!', text: '{{ session('success') }}', showConfirmButton: false, timer: 1800 });
+@endif
+
+@if (session('error'))
+Swal.fire({ icon: 'error', title: 'Gagal!', text: '{{ session('error') }}' });
+@endif
+
+@if ($errors->any())
+Swal.fire({ icon: 'warning', title: 'Validasi Gagal!', html: `{!! implode('<br>', $errors->all()) !!}`, confirmButtonText: 'Oke' });
+@endif
 </script>
 
 <style>

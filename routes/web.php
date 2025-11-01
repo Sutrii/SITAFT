@@ -89,4 +89,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/jadwal/share/{title}-{from}-sampai-{to}', [JadwalController::class, 'sharedView'])
+    ->where([
+        'title' => '.*', // biar bisa ambil semua karakter sebelum tanggal
+        'from' => '\d{4}-\d{2}-\d{2}',
+        'to' => '\d{4}-\d{2}-\d{2}'
+    ])
+    ->name('jadwal.shared');
+
 require __DIR__.'/auth.php';
