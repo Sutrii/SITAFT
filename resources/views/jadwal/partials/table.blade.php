@@ -17,15 +17,22 @@
                 class="w-full border border-[#d8e4d8] rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#3ea76a] focus:outline-none" />
         </div>
 
-        <div class="w-full">
-            <label class="block text-sm font-medium text-[#2d3a32] mb-1">Jenis Seminar</label>
-            <select id="filterStatus"
-                class="w-full border border-[#d8e4d8] rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#3ea76a] focus:outline-none">
-                <option value="">Semua Jenis</option>
-                <option value="Seminar Proposal">Seminar Proposal</option>
-                <option value="Seminar Hasil">Seminar Hasil</option>
-                <option value="Sidang Akhir">Sidang Akhir</option>
-            </select>
+        <div class="w-full flex items-end gap-2">
+            <div class="flex-1">
+                <label class="block text-sm font-medium text-[#2d3a32] mb-1">Jenis Seminar</label>
+                <select id="filterStatus"
+                    class="w-full border border-[#d8e4d8] rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#3ea76a] focus:outline-none">
+                    <option value="">Semua Jenis</option>
+                    <option value="Seminar Proposal">Seminar Proposal</option>
+                    <option value="Seminar Hasil">Seminar Hasil</option>
+                    <option value="Sidang Akhir">Sidang Akhir</option>
+                </select>
+            </div>
+
+            <button id="shareLinkBtn"
+                class="h-[38px] px-4 ml-2.5 flex items-center gap-1 bg-[#3ea76a] text-white rounded-lg text-sm font-medium hover:bg-[#2d8c5d] transition">
+                🔗 Share Link
+            </button>
         </div>
     </div>
 </div>
@@ -261,6 +268,29 @@ $(document).ready(() => {
     $('#filterStatus').on('change', function () {
         table.column(7).search(this.value).draw();
     });
+
+    // 🔗 Tombol Share Link
+    $('#shareLinkBtn').on('click', () => {
+        const link = window.location.href;
+        navigator.clipboard.writeText(link).then(() => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Link disalin!',
+                text: 'URL halaman ini telah disalin ke clipboard.',
+                timer: 1800,
+                showConfirmButton: false
+            });
+        }).catch(() => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal menyalin!',
+                text: 'Browser kamu tidak mendukung fitur salin otomatis.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        });
+    });
+
 });
 </script>
 
