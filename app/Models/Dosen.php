@@ -9,9 +9,9 @@ class Dosen extends Model
 {
     use HasFactory;
 
-    protected $table = 'dosen'; // tabel kamu bukan plural
+    protected $table = 'dosen';
     protected $primaryKey = 'id';
-    public $timestamps = true; // karena kita punya created_at dan updated_at
+    public $timestamps = true;
 
     protected $fillable = [
         'userId',
@@ -22,6 +22,6 @@ class Dosen extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'userId');
+        return $this->belongsTo(\App\Models\User::class, 'userId');
     }
 }

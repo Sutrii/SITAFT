@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class MahasiswaController extends Controller
 {
@@ -21,8 +20,20 @@ class MahasiswaController extends Controller
             'nim'  => 'required|string|max:15|unique:mahasiswa,nim',
         ]);
 
+        $user = \App\Models\User::whereRaw('LOWER(TRIM(name)) = ?', [strtolower(trim($request->name))])->first();
+
+        if (!$user) {
+            $user = \App\Models\User::create([
+                'name'        => $request->name,
+                'email'       => null,
+                'password'    => null,
+                'roleId'      => 1,
+                'positionId'  => 3,
+            ]);
+        }
+
         Mahasiswa::create([
-            'userId' => Auth::id(),
+            'userId' => $user->id,
             'name'   => $request->name,
             'nim'    => $request->nim,
         ]);
@@ -41,6 +52,12 @@ class MahasiswaController extends Controller
             'name' => $request->name,
             'nim'  => $request->nim,
         ]);
+
+        if ($mahasiswa->user) {
+            $mahasiswa->user->update([
+                'name' => $request->name,
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Data mahasiswa berhasil diubah!');
     }

@@ -74,7 +74,6 @@
     </table>
 </div>
 
-{{-- 🌟 Modal Tambah Data --}}
 <div id="addModal"
     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
     <div class="bg-white w-[400px] rounded-2xl shadow-lg overflow-hidden">
@@ -108,7 +107,6 @@
     </div>
 </div>
 
-{{-- 🌟 Modal Edit Data --}}
 <div id="editModal"
     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
     <div class="bg-white w-[400px] rounded-2xl shadow-lg overflow-hidden">
@@ -210,10 +208,6 @@ $(document).ready(function () {
     });
 });
 
-
-// ===================== SWEETALERT NOTIFIKASI =====================
-
-// ✅ Notifikasi sukses tambah / edit / hapus
 @if (session('success'))
 Swal.fire({
     icon: 'success',
@@ -232,8 +226,6 @@ Swal.fire({
 });
 @endif
 
-
-// ===================== MODAL EDIT =====================
 const editModal = document.getElementById('editModal');
 const closeEditModalBtn = document.getElementById('closeEditModalBtn');
 const editForm = document.getElementById('editForm');
@@ -271,7 +263,6 @@ editModal?.addEventListener('click', (e) => {
     }
 });
 
-// ✅ Tambah konfirmasi submit edit + animasi loading
 editForm?.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -287,8 +278,6 @@ editForm?.addEventListener('submit', (e) => {
     }, 700);
 });
 
-
-// ===================== KONFIRMASI HAPUS =====================
 function confirmDelete(actionUrl, name) {
     Swal.fire({
         title: `Hapus ${name}?`,
@@ -323,29 +312,18 @@ function confirmDelete(actionUrl, name) {
 </script>
 
 <style>
-/* Zebra Row */
 #mahasiswaTable tbody tr:nth-child(odd) { background-color: #fafdfa; }
 #mahasiswaTable tbody tr:nth-child(even) { background-color: #ffffff; }
-
-/* Hover Row */
 #mahasiswaTable tbody tr:hover { background-color: #f1f8f4; }
-
-/* Tabel Rapi */
 table.dataTable.no-footer { border-bottom: none; }
 table.dataTable tbody td, table.dataTable thead th { padding: 0.75rem 1rem !important; }
 
-/* Dropdown "Tampilkan X data" */
 .dataTables_length select {
     border: 1px solid #d8e4d8; border-radius: 8px;
     padding: 8px 40px 8px 14px; font-size: 0.875rem;
     color: #2d3a32; background-color: #fff;
     outline: none; cursor: pointer; transition: all 0.2s ease;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg fill='none' stroke='%236b7d6f' stroke-width='1.5' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M8.25 9.75L12 13.5l3.75-3.75'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 8px center; background-size: 14px;
 }
-
-/* Search Bar */
 .dataTables_filter input {
     border: 1px solid #d8e4d8 !important;
     border-radius: 9999px !important;
@@ -355,28 +333,16 @@ table.dataTable tbody td, table.dataTable thead th { padding: 0.75rem 1rem !impo
     background-repeat: no-repeat; background-position: 0.75rem center;
     background-size: 1rem; width: 14rem !important;
 }
-
-/* Pagination & Info */
 .dataTables_wrapper .dataTables_paginate { margin-top: 1rem; }
 .dataTables_wrapper .dataTables_info { color: #6b7d6f; font-size: 0.875rem; }
-
-/* Responsive layout */
 @media (max-width: 640px) {
     .dataTables_length_wrapper, .dataTables_filter_wrapper {
         flex-direction: column; align-items: flex-start; gap: 0.5rem;
     }
 }
-
-/* Header & body sejajar */
 table.dataTable thead th, table.dataTable tbody td { white-space: nowrap; }
-
-/* Pastikan tabel ngisi container penuh */
 #mahasiswaTable { width: 100% !important; min-width: unset !important; }
-
-/* Hilangkan gap horizontal */
 .dataTables_wrapper { overflow-x: visible !important; }
-
-/* Kolom padding */
 #mahasiswaTable th, #mahasiswaTable td {
     padding: 0.75rem 1rem !important;
     text-align: left;

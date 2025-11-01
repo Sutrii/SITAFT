@@ -83,6 +83,17 @@
             </svg>
             Data Mahasiswa
         </a>
+
+        <a href="{{ route('users') }}"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
+            {{ request()->routeIs('users') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15.75 9A3.75 3.75 0 1112 5.25 3.75 3.75 0 0115.75 9zM6 20.25a6 6 0 0112 0H6z" />
+            </svg>
+            Kelola Data Pengguna
+        </a>
     </nav>
 
     <div class="p-6 text-xs text-[#6b7d6f] border-t border-[#e6eee7]">

@@ -16,4 +16,9 @@ class Mahasiswa extends Model
         'name',
         'nim',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'userId');
+    }
 }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Dosen;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class DosenController extends Controller
 {
@@ -25,7 +24,13 @@ class DosenController extends Controller
         $user = \App\Models\User::whereRaw('LOWER(TRIM(name)) = ?', [strtolower(trim($request->name))])->first();
 
         if (!$user) {
-            return redirect()->back()->with('error', 'User untuk dosen ini belum ada di tabel users!');
+            $user = \App\Models\User::create([
+                'name'        => $request->name,
+                'email'       => null,
+                'password'    => null,
+                'roleId'      => 1,
+                'positionId'  => 2,
+            ]);
         }
 
         Dosen::create([
@@ -37,7 +42,6 @@ class DosenController extends Controller
 
         return redirect()->back()->with('success', 'Dosen berhasil ditambahkan!');
     }
-
 
     public function update(Request $request, Dosen $dosen)
     {
@@ -52,6 +56,12 @@ class DosenController extends Controller
             'nik'    => $request->nik,
             'bidang' => $request->bidang,
         ]);
+
+        if ($dosen->user) {
+            $dosen->user->update([
+                'name' => $request->name,
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Data dosen berhasil diubah!');
     }
