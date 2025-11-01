@@ -54,7 +54,7 @@
                 <div class="grid grid-cols-5 gap-6 items-stretch">
 
                     <div class="col-span-3 bg-white rounded-3xl shadow-xl p-6 flex flex-col h-full">
-                        <h3 class="text-lg font-semibold text-green-800 mb-4">Dosen Kosong Hari Ini</h3>
+                        <h3 id="dosenTitle" class="text-lg font-semibold text-green-800 mb-4">Dosen Kosong Hari Ini</h3>
                         <div id="dosenKosongContainer" class="overflow-y-auto space-y-4 flex-1">
                             @forelse ($dosenKosong as $group)
                                 @php
@@ -120,57 +120,109 @@ document.addEventListener("DOMContentLoaded", () => {
     const dosenKosongContainer = document.getElementById("dosenKosongContainer");
 
     const renderDashboard = async (month) => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const firstDay = new Date(year, month - 1, 1).getDay();
+        const daysInMonth = new Date(year, month, 0).getDate();
+
         const res = await fetch(`/dashboard/month/${month}`);
         const data = await res.json();
 
-        monthTitle.textContent = `${bulan[month-1]} ${new Date().getFullYear()}`;
-
+        monthTitle.textContent = `${bulan[month - 1]} ${year}`;
         calendarGrid.innerHTML = "";
-        for (let i = 1; i <= 31; i++) {
-            const seminar = data.find(j => new Date(j.jadwal_seminar).getDate() === i);
-            let color = seminar ? {
-                "Seminar Proposal": "bg-green-200 text-green-800",
-                "Seminar Hasil": "bg-blue-200 text-blue-800",
-                "Sidang Akhir": "bg-red-200 text-red-800",
-            }[seminar.status] : "text-gray-700 hover:bg-green-100";
+
+        for (let i = 0; i < firstDay; i++) {
+            const emptyDiv = document.createElement("div");
+            calendarGrid.appendChild(emptyDiv);
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const seminar = data.find(j => new Date(j.jadwal_seminar).getDate() === day);
+            const isToday = day === today.getDate() && month === (today.getMonth() + 1);
+
+            let colorClass = "text-gray-700 hover:bg-green-100";
+            if (seminar) {
+                colorClass = {
+                    "Seminar Proposal": "bg-green-200 text-green-800",
+                    "Seminar Hasil": "bg-blue-200 text-blue-800",
+                    "Sidang Akhir": "bg-red-200 text-red-800"
+                }[seminar.status] || colorClass;
+            }
 
             const div = document.createElement("div");
-            div.className = `flex items-center justify-center w-9 h-9 mx-auto rounded-full transition cursor-pointer hover:scale-105 ${color}`;
-            div.textContent = i;
+            div.textContent = day;
+            div.className = `
+                flex items-center justify-center w-9 h-9 mx-auto rounded-full cursor-pointer transition
+                hover:scale-105 ${colorClass} ${isToday ? "ring-2 ring-green-500 font-bold" : ""}
+            `;
+
+            div.addEventListener("click", () => {
+                document.querySelectorAll("#calendarGrid div").forEach(d => {
+                    d.classList.remove("ring-2", "ring-green-500", "font-bold");
+                });
+                div.classList.add("ring-2", "ring-green-500", "font-bold");
+                loadDayData(month, day);
+            });
+
             calendarGrid.appendChild(div);
         }
 
         seminarList.innerHTML = "";
-        if (data.length > 0) {
+        if (data.length) {
             data.forEach(j => {
-                const tanggal = new Date(j.jadwal_seminar).toLocaleString("id-ID", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit"
+                const tanggal = new Date(j.jadwal_seminar).toLocaleDateString("id-ID", {
+                    day: "numeric", month: "short", year: "numeric",
+                    hour: "2-digit", minute: "2-digit"
                 });
                 const colorMap = {
                     "Seminar Proposal": "border-green-400 text-green-700",
                     "Seminar Hasil": "border-blue-400 text-blue-700",
                     "Sidang Akhir": "border-red-400 text-red-700"
                 };
-                const color = colorMap[j.status] || "border-gray-300 text-gray-700";
                 seminarList.innerHTML += `
-                    <li class="border-l-4 ${color} pl-3">
+                    <li class="border-l-4 ${colorMap[j.status] ?? "border-gray-300 text-gray-700"} pl-3">
                         <p class="text-gray-800 font-medium">${tanggal}</p>
-                        <p>${j.status} — ${j.mahasiswa?.name ?? '-'}</p>
+                        <p>${j.status} — ${j.mahasiswa?.name ?? "-"}</p>
                     </li>`;
             });
         } else {
             seminarList.innerHTML = `<p class="text-gray-500 text-sm">Belum ada jadwal seminar bulan ini.</p>`;
         }
+    };
 
-        const resDosen = await fetch(`/dashboard/data-today`);
-        const dosenData = await resDosen.json();
+    async function loadDayData(month, day) {
+        const res = await fetch(`/dashboard/data/${month}/${day}`);
+        const { hari, tanggal, dosenKosong, jadwalSeminar } = await res.json();
+
+        const title = document.getElementById("dosenTitle");
+        title.textContent = `Dosen Kosong ${hari}, ${tanggal}`;
+  
+        seminarList.innerHTML = "";
+        if (jadwalSeminar.length) {
+            jadwalSeminar.forEach(j => {
+                const tanggal = new Date(j.jadwal_seminar).toLocaleDateString("id-ID", {
+                    day: "numeric", month: "short", year: "numeric",
+                    hour: "2-digit", minute: "2-digit"
+                });
+                const colorMap = {
+                    "Seminar Proposal": "border-green-400 text-green-700",
+                    "Seminar Hasil": "border-blue-400 text-blue-700",
+                    "Sidang Akhir": "border-red-400 text-red-700"
+                };
+                seminarList.innerHTML += `
+                    <li class="border-l-4 ${colorMap[j.status] ?? "border-gray-300 text-gray-700"} pl-3">
+                        <p class="text-gray-800 font-medium">${tanggal}</p>
+                        <p>${j.status} — ${j.mahasiswa?.name ?? "-"}</p>
+                    </li>`;
+            });
+        } else {
+            seminarList.innerHTML = `<p class="text-gray-500 text-sm">Tidak ada jadwal seminar tanggal ini.</p>`;
+        }
+
         dosenKosongContainer.innerHTML = "";
-        if (dosenData.length > 0) {
-            Object.values(dosenData).forEach(group => {
+        const groups = Object.values(dosenKosong ?? {});
+        if (groups.length) {
+            groups.forEach(group => {
                 const d = group[0].dosen;
                 dosenKosongContainer.innerHTML += `
                     <div class="border border-green-100 rounded-2xl p-4 hover:shadow-md transition">
@@ -182,9 +234,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>`;
             });
         } else {
-            dosenKosongContainer.innerHTML = `<p class="text-gray-500 text-sm">Tidak ada dosen kosong hari ini.</p>`;
+            dosenKosongContainer.innerHTML = `<p class="text-gray-500 text-sm">Tidak ada dosen kosong tanggal ini.</p>`;
         }
-    };
+    }
+
 
     document.getElementById("prevMonthBtn").addEventListener("click", () => {
         currentMonth = currentMonth <= 1 ? 12 : currentMonth - 1;

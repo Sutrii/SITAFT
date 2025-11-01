@@ -12,7 +12,6 @@ class DashboardController extends Controller
     {
         $month = $month ?? Carbon::now()->month;
         $today = Carbon::now()->locale('id')->isoFormat('dddd');
-        $todayLower = strtolower($today);
         $currentMonth = Carbon::createFromDate(null, $month)->translatedFormat('F Y');
 
         $dosenKosong = JadwalDosen::with('dosen')
@@ -45,23 +44,57 @@ class DashboardController extends Controller
 
     public function fetchData($month, $day = null)
     {
-        $day = $day ?? Carbon::now()->locale('id')->isoFormat('dddd');
-        $dayLower = strtolower($day);
+        $year = Carbon::now()->year;
+
+        // tanggal real yang diklik
+        $selectedDate = Carbon::createFromDate($year, $month, $day ?? Carbon::now()->day);
+        // nama hari, pastiin ada kapital di awal biar rapi
+        $hari = ucfirst($selectedDate->locale('id')->isoFormat('dddd'));
+
+        // ambil dosen kosong sesuai hari (case-insensitive)
+        $dosenKosong = JadwalDosen::with('dosen')
+            ->whereRaw('LOWER(TRIM(hari)) = LOWER(TRIM(?))', [$hari])
+            ->where('status', 'Kosong')
+            ->get()
+            ->groupBy('userId');
+
+        // ambil jadwal seminar tanggal itu
+        $jadwalSeminar = Jadwal::with(['mahasiswa', 'skripsi'])
+            ->whereMonth('jadwal_seminar', $month)
+            ->whereDay('jadwal_seminar', $selectedDate->day)
+            ->orderBy('jadwal_seminar', 'asc')
+            ->get();
+
+        return response()->json([
+            'hari' => $hari,
+            'tanggal' => $selectedDate->isoFormat('D MMMM Y'),
+            'dosenKosong' => $dosenKosong,
+            'jadwalSeminar' => $jadwalSeminar,
+        ]);
+    }
+
+    public function dataToday()
+    {
+        $today = Carbon::now();
+        $hari = ucfirst($today->locale('id')->isoFormat('dddd'));
 
         $dosenKosong = JadwalDosen::with('dosen')
-            ->whereRaw('LOWER(TRIM(hari)) = LOWER(TRIM(?))', [$today])
+            ->whereRaw('LOWER(TRIM(hari)) = LOWER(TRIM(?))', [$hari])
             ->where('status', 'Kosong')
             ->get()
             ->groupBy('userId');
 
         $jadwalSeminar = Jadwal::with(['mahasiswa', 'skripsi'])
-            ->whereMonth('jadwal_seminar', $month)
+            ->whereDate('jadwal_seminar', $today)
             ->orderBy('jadwal_seminar', 'asc')
             ->get();
 
         return response()->json([
+            'hari' => $hari,
+            'tanggal' => $today->translatedFormat('d MMMM Y'),
             'dosenKosong' => $dosenKosong,
             'jadwalSeminar' => $jadwalSeminar,
         ]);
     }
+
 }
