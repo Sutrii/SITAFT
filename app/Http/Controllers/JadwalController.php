@@ -66,10 +66,11 @@ class JadwalController extends Controller
 
     public function sharedView($title, $from, $to)
     {
-        $jadwals = \App\Models\Jadwal::with(['mahasiswa', 'skripsi', 'dosen1', 'dosen2'])
-            ->whereBetween('jadwal_seminar', [$from, $to])
-            ->orderBy('jadwal_seminar', 'asc')
-            ->get();
+        $jadwals = Jadwal::with(['mahasiswa', 'skripsi', 'dosen1', 'dosen2'])
+        ->whereDate('jadwal_seminar', '>=', $from)
+        ->whereDate('jadwal_seminar', '<=', $to)
+        ->orderBy('jadwal_seminar', 'asc')
+        ->get();
 
         return view('jadwal.shared', compact('jadwals', 'title', 'from', 'to'));
     }
