@@ -2,10 +2,12 @@
 <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-semibold text-[#2d3a32]">Jadwal Tugas Akhir</h2>
 
-    <button id="openModalBtn"
-        class="bg-[#3ea76a] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#2d8c5d] transition">
-        + Tambah Jadwal
-    </button>
+    @if(!(Auth::user()->roleId == 1 && Auth::user()->positionId == 3))
+        <button id="openModalBtn"
+            class="bg-[#3ea76a] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#2d8c5d] transition">
+            + Tambah Jadwal
+        </button>
+    @endif
 </div>
 
 {{-- Filter Bar --}}
@@ -29,17 +31,20 @@
                 </select>
             </div>
 
-            <button id="shareLinkBtn"
-                class="h-[38px] px-4 ml-2.5 flex items-center gap-1 bg-[#3ea76a] text-white rounded-lg text-sm font-medium hover:bg-[#2d8c5d] transition">
-                🔗 Share Link
-            </button>
+            {{-- Tombol Share disembunyikan jika Mahasiswa Viewer --}}
+            @if(!(Auth::user()->roleId == 1 && Auth::user()->positionId == 3))
+                <button id="shareLinkBtn"
+                    class="h-[38px] px-4 ml-2.5 flex items-center gap-1 bg-[#3ea76a] text-white rounded-lg text-sm font-medium hover:bg-[#2d8c5d] transition">
+                    🔗 Share Link
+                </button>
+            @endif
         </div>
     </div>
 </div>
 
 {{-- DataTable --}}
 <div class="bg-white rounded-2xl shadow-md p-6 overflow-x-auto">
-    <table id="jadwalTable" class="display text-sm min-w-[950px]">
+    <table id="jadwalTable" class="display text-sm min-w-[950px] w-full border-collapse">
         <thead>
             <tr class="text-[#2d3a32] border-b border-[#e8f0e8]">
                 <th>No</th>
@@ -50,25 +55,51 @@
                 <th>Tanggal</th>
                 <th>Jam</th>
                 <th>Status</th>
-                <th class="text-center">Aksi</th>
+                <th class="text-center aksi-col {{ Auth::user()->roleId == 1 && Auth::user()->positionId == 3 ? 'hidden' : '' }}">
+                    Aksi
+                </th>
             </tr>
         </thead>
+
         <tbody>
-            @forelse ($jadwals as $index => $jadwal)
+        @forelse ($jadwals as $index => $jadwal)
+            <tr>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ $jadwal->mahasiswa->name ?? '-' }}</td>
+                <td>{{ $jadwal->skripsi->judul_skripsi ?? '-' }}</td>
+                <td>{{ $jadwal->dosen1->name ?? '-' }}</td>
+                <td>{{ $jadwal->dosen2->name ?? '-' }}</td>
+                <td>{{ \Carbon\Carbon::parse($jadwal->jadwal_seminar)->format('Y-m-d') }}</td>
+                <td>{{ \Carbon\Carbon::parse($jadwal->jadwal_seminar)->format('H:i') }}</td>
                 @php
-                    $tanggal = \Carbon\Carbon::parse($jadwal->jadwal_seminar)->format('Y-m-d');
-                    $jam = \Carbon\Carbon::parse($jadwal->jadwal_seminar)->format('H:i');
+                    $status = $jadwal->status;
+                    $badgeColor = match($status) {
+                        'Seminar Proposal' => 'background-color:#fde8e8; color:#b91c1c;', // merah lembut
+                        'Seminar Hasil' => 'background-color:#e0e7ff; color:#3730a3;',   // biru lembut
+                        'Sidang Akhir' => 'background-color:#dcfce7; color:#166534;',   // hijau lembut
+                        default => 'background-color:#f3f4f6; color:#374151;'           // abu default
+                    };
                 @endphp
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $jadwal->mahasiswa->name ?? '-' }}</td>
-                    <td>{{ $jadwal->skripsi->judul_skripsi ?? '-' }}</td>
-                    <td>{{ $jadwal->dosen1->name ?? '-' }}</td>
-                    <td>{{ $jadwal->dosen2->name ?? '-' }}</td>
-                    <td>{{ $tanggal }}</td>
-                    <td>{{ $jam }}</td>
-                    <td>{{ $jadwal->status }}</td>
-                    <td class="text-center">
+
+                <td class="text-left">
+                    <span style="
+                        display:inline-block;
+                        min-width:90px;
+                        text-align:left;
+                        padding:2px 8px;
+                        border-radius:12px;
+                        font-size:0.78rem;
+                        font-weight:600;
+                        line-height:1.2;
+                        white-space:nowrap;
+                        {{ $badgeColor }};
+                    ">
+                        {{ $jadwal->status }}
+                    </span>
+                </td>
+
+                <td class="text-center aksi-col {{ Auth::user()->roleId == 1 && Auth::user()->positionId == 3 ? 'hidden' : '' }}">
+                    @if(!(Auth::user()->roleId == 1 && Auth::user()->positionId == 3))
                         <div class="flex justify-center gap-3">
                             <button type="button" class="text-blue-500 hover:text-blue-700 transition"
                                 onclick="openEditModal('{{ $jadwal->id }}', '{{ $jadwal->mahasiswaId }}', '{{ $jadwal->skripsiId }}', '{{ $jadwal->dosenId1 }}', '{{ $jadwal->dosenId2 }}', '{{ $jadwal->jadwal_seminar }}', '{{ $jadwal->status }}')">
@@ -79,13 +110,14 @@
                                 🗑️
                             </button>
                         </div>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="9" class="text-center text-gray-500 py-4">Tidak ada data jadwal</td>
-                </tr>
-            @endforelse
+                    @endif
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="9" class="text-center text-gray-500 py-4">Tidak ada data jadwal</td>
+            </tr>
+        @endforelse
         </tbody>
     </table>
 </div>
@@ -247,15 +279,17 @@ const addModal = document.getElementById('addModal');
 const openModalBtn = document.getElementById('openModalBtn');
 const closeModalBtn = document.getElementById('closeModalBtn');
 
-openModalBtn.addEventListener('click', () => {
+openModalBtn?.addEventListener('click', () => {
     addModal.classList.remove('hidden', 'opacity-0');
     addModal.classList.add('flex');
 });
-closeModalBtn.addEventListener('click', () => {
+
+closeModalBtn?.addEventListener('click', () => {
     addModal.classList.add('hidden', 'opacity-0');
     addModal.classList.remove('flex');
 });
-addModal.addEventListener('click', (e) => {
+
+addModal?.addEventListener('click', (e) => {
     if (e.target === addModal) {
         addModal.classList.add('hidden', 'opacity-0');
         addModal.classList.remove('flex');
@@ -263,6 +297,7 @@ addModal.addEventListener('click', (e) => {
 });
 
 $(document).ready(() => {
+    const isMahasiswa = {{ Auth::user()->roleId == 1 && Auth::user()->positionId == 3 ? 'true' : 'false' }};
     const table = $('#jadwalTable').DataTable({
         pageLength: 5,
         lengthChange: true,
@@ -277,7 +312,11 @@ $(document).ready(() => {
         dom:
             "<'flex justify-between items-center mb-4 flex-wrap gap-3'<'dataTables_length_wrapper'l><'dataTables_filter_wrapper'f>>" +
             "tr" +
-            "<'flex justify-between items-center mt-3 flex-wrap gap-3'<'dataTables_info_wrapper'i><'dataTables_pagination_wrapper'p>>"
+            "<'flex justify-between items-center mt-3 flex-wrap gap-3'<'dataTables_info_wrapper'i><'dataTables_pagination_wrapper'p>>",
+        columnDefs: [
+            { targets: isMahasiswa ? [] : [8], orderable: false, searchable: false },
+            { targets: isMahasiswa ? [8] : [], visible: !isMahasiswa } // 🔥 auto-hide kolom aksi
+        ]
     });
 
     $('#filterNama').on('keyup', function () {
@@ -431,4 +470,8 @@ table.dataTable tbody td, table.dataTable thead th { padding: 0.75rem 1rem !impo
 }
 .dataTables_wrapper .dataTables_paginate { margin-top: 1rem; }
 .dataTables_wrapper .dataTables_info { color: #6b7d6f; font-size: 0.875rem; }
+.aksi-col.hidden {
+    display: none !important;
+    visibility: collapse !important;
+}
 </style>

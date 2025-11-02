@@ -22,7 +22,11 @@ class UserController extends Controller
             'positionId' => 'required|in:1,2,3',
         ];
 
-        if ($request->positionId == 1) {
+        // Kondisi lama tetap + tambahan Viewer + Mahasiswa
+        if (
+            $request->positionId == 1 ||
+            ($request->roleId == 1 && $request->positionId == 3)
+        ) {
             $rules['email'] = 'required|email|unique:users,email';
             $rules['password'] = 'required|min:6';
         }
@@ -48,7 +52,10 @@ class UserController extends Controller
             'positionId' => 'required|in:1,2,3',
         ];
 
-        if ($request->positionId == 1) {
+        if (
+            $request->positionId == 1 ||
+            ($request->roleId == 1 && $request->positionId == 3)
+        ) {
             $rules['email'] = 'required|email|unique:users,email,' . $user->id;
             if ($request->filled('password')) {
                 $rules['password'] = 'min:6';

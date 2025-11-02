@@ -7,6 +7,7 @@ use App\Models\Mahasiswa;
 use App\Models\Dosen;
 use App\Models\Skripsi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JadwalController extends Controller
 {
@@ -24,6 +25,10 @@ class JadwalController extends Controller
 
     public function store(Request $request)
     {
+        if (Auth::user()->roleId == 1 && Auth::user()->positionId == 3) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk menambah jadwal.');
+        }
+
         $request->validate([
             'skripsiId' => 'required|exists:skripsi,id',
             'mahasiswaId' => 'required|exists:mahasiswa,id',
@@ -40,6 +45,10 @@ class JadwalController extends Controller
 
     public function update(Request $request, Jadwal $jadwal)
     {
+        if (Auth::user()->roleId == 1 && Auth::user()->positionId == 3) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk mengubah jadwal.');
+        }
+
         $request->validate([
             'skripsiId' => 'required|exists:skripsi,id',
             'mahasiswaId' => 'required|exists:mahasiswa,id',
@@ -56,6 +65,10 @@ class JadwalController extends Controller
 
     public function destroy(Jadwal $jadwal)
     {
+        if (Auth::user()->roleId == 1 && Auth::user()->positionId == 3) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk menghapus jadwal.');
+        }
+
         try {
             $jadwal->delete();
             return redirect()->back()->with('success', 'Jadwal berhasil dihapus!');
@@ -67,10 +80,10 @@ class JadwalController extends Controller
     public function sharedView($title, $from, $to)
     {
         $jadwals = Jadwal::with(['mahasiswa', 'skripsi', 'dosen1', 'dosen2'])
-        ->whereDate('jadwal_seminar', '>=', $from)
-        ->whereDate('jadwal_seminar', '<=', $to)
-        ->orderBy('jadwal_seminar', 'asc')
-        ->get();
+            ->whereDate('jadwal_seminar', '>=', $from)
+            ->whereDate('jadwal_seminar', '<=', $to)
+            ->orderBy('jadwal_seminar', 'asc')
+            ->get();
 
         return view('jadwal.shared', compact('jadwals', 'title', 'from', 'to'));
     }

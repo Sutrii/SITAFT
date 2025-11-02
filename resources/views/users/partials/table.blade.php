@@ -269,13 +269,28 @@ $(document).ready(function () {
     });
 });
 
-function toggleEmailPassword(type, value) {
+function toggleEmailPassword(type) {
+    const role = document.querySelector(
+        type === 'add' ? 'select[name="roleId"]' : '#editRole'
+    ).value;
+    const position = document.querySelector(
+        type === 'add' ? '#positionSelectAdd' : '#editPosition'
+    ).value;
     const section = document.getElementById(
         type === 'add' ? 'emailPasswordAdd' : 'emailPasswordEdit'
     );
-    if (value === '1') section.classList.remove('hidden');
-    else section.classList.add('hidden');
+
+    if (position === '1' || (role === '1' && position === '3')) {
+        section.classList.remove('hidden');
+    } else {
+        section.classList.add('hidden');
+    }
 }
+
+document.querySelector('select[name="roleId"]')?.addEventListener('change', () => toggleEmailPassword('add'));
+document.querySelector('#positionSelectAdd')?.addEventListener('change', () => toggleEmailPassword('add'));
+document.querySelector('#editRole')?.addEventListener('change', () => toggleEmailPassword('edit'));
+document.querySelector('#editPosition')?.addEventListener('change', () => toggleEmailPassword('edit'));
 
 const editModal = document.getElementById('editModal');
 const closeEditModalBtn = document.getElementById('closeEditModalBtn');

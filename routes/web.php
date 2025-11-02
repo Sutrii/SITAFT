@@ -8,6 +8,7 @@ use App\Http\Controllers\SkripsiController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\BorangController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -89,9 +90,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/borang', [BorangController::class, 'index'])->name('borang');
+
 Route::get('/jadwal/share/{title}-{from}-sampai-{to}', [JadwalController::class, 'sharedView'])
     ->where([
-        'title' => '.*', // biar bisa ambil semua karakter sebelum tanggal
+        'title' => '.*',
         'from' => '\d{4}-\d{2}-\d{2}',
         'to' => '\d{4}-\d{2}-\d{2}'
     ])
