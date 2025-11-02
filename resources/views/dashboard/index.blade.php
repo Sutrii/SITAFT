@@ -251,3 +251,48 @@ document.addEventListener("DOMContentLoaded", () => {
     renderDashboard(currentMonth);
 });
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const userMenu = document.getElementById('user-menu');
+  const dropdown = document.getElementById('user-dropdown');
+
+  if (userMenu && dropdown) {
+    userMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!userMenu.contains(e.target)) dropdown.classList.add('hidden');
+    });
+  }
+});
+</script>
+
+<style>
+[x-cloak],
+[x-data],
+[x-init],
+[x-show],
+[x-transition],
+[x-bind] {
+  z-index: auto !important;
+}
+
+header {
+  position: relative !important;
+  z-index: 100 !important;
+}
+
+#user-dropdown {
+  z-index: 99999 !important;
+  pointer-events: auto;
+}
+
+.flex-1,
+main {
+  overflow: visible !important;
+}
+</style>
+
