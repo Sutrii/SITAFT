@@ -1,16 +1,13 @@
 {{-- resources/views/layouts/sidebar.blade.php --}}
 <aside class="w-64 bg-[#f4f8f4] text-[#2d3a32] flex flex-col border-r border-[#e6eee7]">
     <div class="p-6 flex items-center gap-3">
-        <div class="w-10 h-10 bg-[#dff3e5] flex items-center justify-center rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-[#3ea76a]">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 8.25v3.75l2.25 1.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+        <div class="w-10 h-10 flex items-center justify-center rounded-full overflow-hidden">
+            <img src="{{ asset('assets/images/unsyiah.png') }}" alt="Logo Unsyiah" class="w-full h-full object-cover">
         </div>
         <div>
             <h1 class="font-semibold text-[#2d3a32]">SITAFT</h1>
-            <p class="text-sm text-[#6b7d6f]">Tugas Akhir FT</p>
+            <p class="text-sm text-[#6b7d6f]">Sistem Tugas Akhir</p>
+            <p class="text-sm text-[#6b7d6f]">Fakultas Teknik</p>
         </div>
     </div>
 
