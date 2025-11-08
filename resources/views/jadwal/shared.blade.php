@@ -171,7 +171,7 @@
                     <td>{{ $jadwal->dosen2->name ?? '-' }}</td>
                     <td>{{ $tanggal }}</td>
                     <td>{{ $jam }}</td>
-                    <td>
+                    <td data-status="{{ $jadwal->status }}">
                         <span style="padding:4px 10px; border-radius:20px; font-size:0.85rem; font-weight:600; {{ $badgeColor }}">
                             {{ $jadwal->status }}
                         </span>

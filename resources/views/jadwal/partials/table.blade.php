@@ -81,7 +81,7 @@
                     };
                 @endphp
 
-                <td class="text-left">
+                <td class="text-left" data-status="{{ $jadwal->status }}">
                     <span style="
                         display:inline-block;
                         min-width:90px;
@@ -314,16 +314,35 @@ $(document).ready(() => {
             "tr" +
             "<'flex justify-between items-center mt-3 flex-wrap gap-3'<'dataTables_info_wrapper'i><'dataTables_pagination_wrapper'p>>",
         columnDefs: [
+            {
+            targets: 7,
+            render: function (data, type, row) {
+                if (type === 'display') return data;
+                return $(data).text();
+            }
+            },
             { targets: isMahasiswa ? [] : [8], orderable: false, searchable: false },
-            { targets: isMahasiswa ? [8] : [], visible: !isMahasiswa } // 🔥 auto-hide kolom aksi
+            { targets: isMahasiswa ? [8] : [], visible: !isMahasiswa }
         ]
-    });
+        });
 
     $('#filterNama').on('keyup', function () {
         table.column(1).search(this.value).draw();
     });
     $('#filterStatus').on('change', function () {
-        table.column(7).search(this.value).draw();
+        const val = this.value.trim();
+
+        $.fn.dataTable.ext.search = [];
+
+        if (val) {
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                const cell = $(table.row(dataIndex).node()).find('td[data-status]');
+                const status = cell.data('status');
+                return status === val;
+            });
+        }
+
+        table.draw();
     });
 
     $('#shareLinkBtn').on('click', function () {
@@ -337,8 +356,10 @@ $(document).ready(() => {
         const sortedTanggal = tanggalList.sort((a, b) => new Date(a) - new Date(b));
         const from = sortedTanggal[0];
         const to = sortedTanggal[sortedTanggal.length - 1];
+        const selectedStatus = $('#filterStatus').val() || 'all';
         const title = 'Jadwal-Seminar-Tugas-Akhir-Mahasiswa';
-        const url = `${window.location.origin}/jadwal/share/${title}-${from}-sampai-${to}`;
+
+        const url = `${window.location.origin}/jadwal/share/${title}-${from}-sampai-${to}?status=${encodeURIComponent(selectedStatus)}`;
 
         navigator.clipboard.writeText(url).then(() => {
             Swal.fire({

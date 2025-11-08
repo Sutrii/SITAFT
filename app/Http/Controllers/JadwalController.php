@@ -77,14 +77,22 @@ class JadwalController extends Controller
         }
     }
 
-    public function sharedView($title, $from, $to)
+    public function sharedView($title, $from, $to, Request $request)
     {
-        $jadwals = Jadwal::with(['mahasiswa', 'skripsi', 'dosen1', 'dosen2'])
+        $status = $request->query('status');
+
+        $query = Jadwal::with(['mahasiswa', 'skripsi', 'dosen1', 'dosen2'])
             ->whereDate('jadwal_seminar', '>=', $from)
             ->whereDate('jadwal_seminar', '<=', $to)
-            ->orderBy('jadwal_seminar', 'asc')
-            ->get();
+            ->orderBy('jadwal_seminar', 'asc');
 
-        return view('jadwal.shared', compact('jadwals', 'title', 'from', 'to'));
+        if ($status && $status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        $jadwals = $query->get();
+
+        return view('jadwal.shared', compact('jadwals', 'title', 'from', 'to', 'status'));
     }
+
 }
