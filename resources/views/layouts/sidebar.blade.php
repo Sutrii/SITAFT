@@ -1,13 +1,12 @@
 {{-- resources/views/layouts/sidebar.blade.php --}}
 <aside class="w-64 bg-[#f4f8f4] text-[#2d3a32] flex flex-col border-r border-[#e6eee7]">
     <div class="p-6 flex items-center gap-3">
-        <div class="w-10 h-10 flex items-center justify-center rounded-full overflow-hidden">
-            <img src="{{ asset('assets/images/unsyiah.png') }}" alt="Logo Unsyiah" class="w-full h-full object-cover">
+        <div class="w-[96px] h-[96px] flex items-center justify-center rounded-full overflow-hidden">
+            <img src="{{ asset('assets/images/unsyiah.png') }}" alt="Logo Unsyiah" class="object-contain w-full h-full p-1">
         </div>
         <div>
-            <h1 class="font-semibold text-[#2d3a32]">SITAFT</h1>
-            <p class="text-sm text-[#6b7d6f]">Sistem Tugas Akhir</p>
-            <p class="text-sm text-[#6b7d6f]">Fakultas Teknik</p>
+            <h1 class="font-semibold text-[#2d3a32]">SITAFT PSTI</h1>
+            <p class="text-sm text-[#6b7d6f]">Sistem Tugas Akhir Program Studi Teknik Industri</p>
         </div>
     </div>
 
