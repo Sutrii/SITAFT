@@ -10,6 +10,8 @@ class Jadwal extends Model
     use HasFactory;
 
     protected $table = 'jadwal';
+    protected $primaryKey = 'id';
+    public $timestamps = true;
 
     protected $fillable = [
         'skripsiId',
@@ -17,22 +19,27 @@ class Jadwal extends Model
         'dosenId1',
         'dosenId2',
         'jadwal_seminar',
+        'jadwal_seminar_selesai',
         'status',
     ];
 
-    public function mahasiswa() {
-        return $this->belongsTo(Mahasiswa::class, 'mahasiswaId');
+    public function mahasiswa()
+    {
+        return $this->belongsTo(\App\Models\Mahasiswa::class, 'mahasiswaId');
     }
 
-    public function skripsi() {
-        return $this->belongsTo(Skripsi::class, 'skripsiId');
+    public function skripsi()
+    {
+        return $this->belongsTo(\App\Models\Skripsi::class, 'skripsiId');
     }
 
-    public function dosen1() {
-        return $this->belongsTo(Dosen::class, 'dosenId1');
+    public function dosen1()
+    {
+        return $this->belongsTo(\App\Models\Dosen::class, 'dosenId1');
     }
 
-    public function dosen2() {
-        return $this->belongsTo(Dosen::class, 'dosenId2');
+    public function dosen2()
+    {
+        return $this->belongsTo(\App\Models\Dosen::class, 'dosenId2');
     }
 }

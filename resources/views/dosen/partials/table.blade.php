@@ -75,7 +75,7 @@
             Tambah Dosen
         </div>
 
-        <form action="{{ route('dosen.store') }}" method="POST" class="p-5 space-y-4">
+        <form action="{{ route('data-dosen') }}" method="POST" class="p-5 space-y-4">
             @csrf
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Dosen</label>

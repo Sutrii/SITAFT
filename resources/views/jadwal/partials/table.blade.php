@@ -165,6 +165,19 @@
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dosen Pembimbing 1</label>
+                    <input type="text" id="pembimbing1" readonly
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100 cursor-not-allowed">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dosen Pembimbing 2</label>
+                    <input type="text" id="pembimbing2" readonly
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100 cursor-not-allowed">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Dosen Penguji 1</label>
                     <select name="dosenId1" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
                         <option value="">-- Pilih Dosen --</option>
@@ -245,6 +258,19 @@
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dosen Pembimbing 1</label>
+                    <input type="text" id="editPembimbing1" readonly
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100 cursor-not-allowed">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dosen Pembimbing 2</label>
+                    <input type="text" id="editPembimbing2" readonly
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100 cursor-not-allowed">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Dosen Penguji 1</label>
                     <select name="dosenId1" id="editDosen1" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
                         @foreach ($dosens as $d)
@@ -297,6 +323,46 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+$(document).on('change', 'select[name="skripsiId"]', function() {
+    const skripsiId = $(this).val();
+    if (!skripsiId) return;
+
+    fetch(`/skripsi/${skripsiId}/detail`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) return;
+
+            $('#pembimbing1').val(data.dosen1.name || '-');
+            $('#pembimbing2').val(data.dosen2.name || '-');
+
+            const bidang = data.bidang;
+            if (bidang) {
+                fetch(`/dosen/by-bidang/${encodeURIComponent(bidang)}`)
+                    .then(res => res.json())
+                    .then(dosens => {
+                        const selectPenguji1 = $('select[name="dosenId1"]');
+                        selectPenguji1.empty().append('<option value="">-- Pilih Dosen Penguji 1 --</option>');
+
+                        if (dosens.error) {
+                            selectPenguji1.append(`<option disabled>${dosens.error}</option>`);
+                        } else {
+                            dosens.forEach(d => {
+                                selectPenguji1.append(`<option value="${d.id}">${d.name}</option>`);
+                            });
+                        }
+                    });
+            }
+
+            ['#pembimbing1', '#pembimbing2'].forEach(sel => {
+                $(sel).css('box-shadow', '0 0 0 3px #bbf7d0');
+                setTimeout(() => $(sel).css('box-shadow', 'none'), 1200);
+            });
+        })
+        .catch(err => console.error(err));
+});
+</script>
 
 <script>
 const addModal = document.getElementById('addModal');
@@ -436,9 +502,38 @@ function openEditModal(id, mahasiswaId, skripsiId, dosen1, dosen2, jadwalMulai, 
             document.getElementById('editStatus').value = status;
 
             editForm.action = `/jadwal/${id}`;
+
+            fetch(`/skripsi/${skripsiId}/detail`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) return;
+                    $('#editPembimbing1').val(data.dosen1.name || '-');
+                    $('#editPembimbing2').val(data.dosen2.name || '-');
+                })
+                .catch(err => console.error(err));
         }
     });
 }
+
+$(document).on('change', '#editSkripsi', function() {
+    const skripsiId = $(this).val();
+    if (!skripsiId) return;
+
+    fetch(`/skripsi/${skripsiId}/detail`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) return;
+
+            $('#editPembimbing1').val(data.dosen1.name || '-');
+            $('#editPembimbing2').val(data.dosen2.name || '-');
+
+            ['#editPembimbing1', '#editPembimbing2'].forEach(sel => {
+                $(sel).css('box-shadow', '0 0 0 3px #bbf7d0');
+                setTimeout(() => $(sel).css('box-shadow', 'none'), 1200);
+            });
+        })
+        .catch(err => console.error(err));
+});
 
 closeEditModalBtn?.addEventListener('click', () => {
     editModal.classList.add('hidden', 'opacity-0');

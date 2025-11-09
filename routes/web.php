@@ -100,4 +100,8 @@ Route::get('/jadwal/share/{title}/{from}/{to}', [JadwalController::class, 'share
     ])
     ->name('jadwal.shared');
 
+Route::get('/skripsi/{id}/detail', [SkripsiController::class, 'getById'])->name('skripsi.detail');
+
+Route::get('/dosen/by-bidang/{bidang}', [\App\Http\Controllers\DosenController::class, 'getByBidang']);
+
 require __DIR__.'/auth.php';

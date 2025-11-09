@@ -75,4 +75,17 @@ class DosenController extends Controller
             return redirect()->back()->with('error', 'Gagal menghapus data dosen!');
         }
     }
+
+    public function getByBidang($bidang)
+    {
+        $dosens = Dosen::where('bidang', $bidang)
+            ->orderBy('name')
+            ->get(['id', 'name', 'bidang']);
+
+        if ($dosens->isEmpty()) {
+            return response()->json(['error' => 'Tidak ada dosen dengan bidang ini'], 404);
+        }
+
+        return response()->json($dosens);
+    }
 }

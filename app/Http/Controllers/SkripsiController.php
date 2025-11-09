@@ -21,43 +21,43 @@ class SkripsiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_mahasiswa' => 'required|string|max:255',
-            'judul_skripsi'  => 'required|string|max:255',
-            'bidang'         => 'required|string|max:255',
-            'dosen_pembimbing_1' => 'required|exists:dosens,id',
-            'dosen_pembimbing_2' => 'required|exists:dosens,id',
+            'nama_mahasiswa'      => 'required|string|max:255',
+            'judul_skripsi'       => 'required|string|max:255',
+            'bidang'              => 'required|string|max:255',
+            'dosen_pembimbing_1'  => 'required|exists:dosen,id',
+            'dosen_pembimbing_2'  => 'required|exists:dosen,id|different:dosen_pembimbing_1',
         ]);
 
         Skripsi::create([
-            'nama_mahasiswa' => $request->nama_mahasiswa,
-            'judul_skripsi'  => $request->judul_skripsi,
-            'bidang'         => $request->bidang,
-            'dosen_pembimbing_1' => $request->dosen_pembimbing_1,
-            'dosen_pembimbing_2' => $request->dosen_pembimbing_2,
+            'nama_mahasiswa'      => $request->nama_mahasiswa,
+            'judul_skripsi'       => $request->judul_skripsi,
+            'bidang'              => $request->bidang,
+            'dosen_pembimbing_1'  => $request->dosen_pembimbing_1,
+            'dosen_pembimbing_2'  => $request->dosen_pembimbing_2,
         ]);
 
-        return redirect()->back()->with('success', 'Data skripsi berhasil ditambahkan!');
+        return back()->with('success', 'Data skripsi berhasil ditambahkan!');
     }
 
     public function update(Request $request, Skripsi $skripsi)
     {
         $request->validate([
-            'nama_mahasiswa' => 'required|string|max:255',
-            'judul_skripsi'  => 'required|string|max:255',
-            'bidang'         => 'required|string|max:255',
-            'dosen_pembimbing_1' => 'required|string|max:255',
-            'dosen_pembimbing_2' => 'required|string|max:255',
+            'nama_mahasiswa'      => 'required|string|max:255',
+            'judul_skripsi'       => 'required|string|max:255',
+            'bidang'              => 'required|string|max:255',
+            'dosen_pembimbing_1'  => 'required|exists:dosen,id',
+            'dosen_pembimbing_2'  => 'required|exists:dosen,id|different:dosen_pembimbing_1',
         ]);
 
         $skripsi->update([
-            'nama_mahasiswa' => $request->nama_mahasiswa,
-            'judul_skripsi'  => $request->judul_skripsi,
-            'bidang'         => $request->bidang,
-            'dosen_pembimbing_1' => $request->dosen_pembimbing_1,
-            'dosen_pembimbing_2' => $request->dosen_pembimbing_2,
+            'nama_mahasiswa'      => $request->nama_mahasiswa,
+            'judul_skripsi'       => $request->judul_skripsi,
+            'bidang'              => $request->bidang,
+            'dosen_pembimbing_1'  => $request->dosen_pembimbing_1,
+            'dosen_pembimbing_2'  => $request->dosen_pembimbing_2,
         ]);
 
-        return redirect()->back()->with('success', 'Data skripsi berhasil diperbarui!');
+        return back()->with('success', 'Data skripsi berhasil diperbarui!');
     }
 
     public function destroy(Skripsi $skripsi)
@@ -68,5 +68,28 @@ class SkripsiController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus data skripsi!');
         }
+    }
+
+    public function getById($id)
+    {
+        $skripsi = Skripsi::with(['dosen1', 'dosen2'])->find($id);
+
+        if (!$skripsi) {
+            return response()->json(['error' => 'Data tidak ditemukan'], 404);
+        }
+
+        return response()->json([
+            'id' => $skripsi->id,
+            'judul_skripsi' => $skripsi->judul_skripsi,
+            'bidang' => $skripsi->bidang,
+            'dosen1' => [
+                'id' => $skripsi->dosen1->id ?? null,
+                'name' => $skripsi->dosen1->name ?? '-'
+            ],
+            'dosen2' => [
+                'id' => $skripsi->dosen2->id ?? null,
+                'name' => $skripsi->dosen2->name ?? '-'
+            ],
+        ]);
     }
 }
