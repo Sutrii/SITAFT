@@ -22,11 +22,7 @@ class UserController extends Controller
             'positionId' => 'required|in:1,2,3',
         ];
 
-        // Kondisi lama tetap + tambahan Viewer + Mahasiswa
-        if (
-            $request->positionId == 1 ||
-            ($request->roleId == 1 && $request->positionId == 3)
-        ) {
+        if ($request->positionId == 1 || ($request->roleId == 1 && $request->positionId == 3)) {
             $rules['email'] = 'required|email|unique:users,email';
             $rules['password'] = 'required|min:6';
         }
@@ -36,12 +32,12 @@ class UserController extends Controller
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'] ?? null,
-            'password' => isset($validated['password']) ? Hash::make($validated['password']) : null,
+            'password' => $validated['password'] ?? null,
             'roleId' => $validated['roleId'],
             'positionId' => $validated['positionId'],
         ]);
 
-        return redirect()->back()->with('success', 'Pengguna berhasil ditambahkan!');
+        return back()->with('success', 'Pengguna berhasil ditambahkan!');
     }
 
     public function update(Request $request, User $user)
@@ -52,10 +48,7 @@ class UserController extends Controller
             'positionId' => 'required|in:1,2,3',
         ];
 
-        if (
-            $request->positionId == 1 ||
-            ($request->roleId == 1 && $request->positionId == 3)
-        ) {
+        if ($request->positionId == 1 || ($request->roleId == 1 && $request->positionId == 3)) {
             $rules['email'] = 'required|email|unique:users,email,' . $user->id;
             if ($request->filled('password')) {
                 $rules['password'] = 'min:6';
@@ -72,13 +65,14 @@ class UserController extends Controller
         ];
 
         if (!empty($validated['password'])) {
-            $updateData['password'] = Hash::make($validated['password']);
+            $updateData['password'] = $validated['password'];
         }
 
         $user->update($updateData);
 
-        return redirect()->back()->with('success', 'Data pengguna berhasil diubah!');
+        return back()->with('success', 'Data pengguna berhasil diubah!');
     }
+
 
     public function destroy(User $user)
     {
