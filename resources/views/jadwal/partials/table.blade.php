@@ -450,14 +450,26 @@ $(document).ready(() => {
     $('#filterDosen').on('keyup', function () {
         const val = this.value.trim().toLowerCase();
 
-        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-            const pemb1 = data[3]?.toLowerCase() || '';
-            const pemb2 = data[4]?.toLowerCase() || '';
-            return val === '' || pemb1.includes(val) || pemb2.includes(val);
-        });
+        $.fn.dataTable.ext.search = [];
+
+        if (val) {
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                const pemb1 = data[3]?.toLowerCase() || '';
+                const pemb2 = data[4]?.toLowerCase() || '';
+                const peng1 = data[5]?.toLowerCase() || '';
+                const peng2 = data[6]?.toLowerCase() || '';
+                return (
+                    pemb1.includes(val) ||
+                    pemb2.includes(val) ||
+                    peng1.includes(val) ||
+                    peng2.includes(val)
+                );
+            });
+        }
 
         table.draw();
     });
+
     $('#filterStatus').on('change', function () {
         const val = this.value.trim();
 
