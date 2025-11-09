@@ -343,15 +343,14 @@ $(document).on('change', 'select[name="skripsiId"]', function() {
                     .then(res => res.json())
                     .then(dosens => {
                         const selectPenguji1 = $('select[name="dosenId1"]');
+                        const selectPenguji2 = $('select[name="dosenId2"]');
                         selectPenguji1.empty().append('<option value="">-- Pilih Dosen Penguji 1 --</option>');
+                        selectPenguji2.empty().append('<option value="">-- Pilih Dosen Penguji 2 --</option>');
 
-                        if (dosens.error) {
-                            selectPenguji1.append(`<option disabled>${dosens.error}</option>`);
-                        } else {
-                            dosens.forEach(d => {
-                                selectPenguji1.append(`<option value="${d.id}">${d.name}</option>`);
-                            });
-                        }
+                        dosens.forEach(d => {
+                            selectPenguji1.append(`<option value="${d.id}">${d.name}</option>`);
+                            selectPenguji2.append(`<option value="${d.id}">${d.name}</option>`);
+                        });
                     });
             }
 
@@ -362,6 +361,35 @@ $(document).on('change', 'select[name="skripsiId"]', function() {
         })
         .catch(err => console.error(err));
 });
+
+let allDosens = [];
+
+fetch(`/dosen/all`)
+    .then(res => res.json())
+    .then(data => allDosens = data)
+    .catch(err => console.error(err));
+
+    $(document).on('change', 'select[name="dosenId1"]', function() {
+        const val = $(this).val();
+        const select2 = $('select[name="dosenId2"]');
+        const currentVal2 = select2.val();
+
+        if (val && !currentVal2) {
+            select2.empty().append('<option value="">-- Pilih Dosen Penguji 2 --</option>');
+            allDosens.forEach(d => select2.append(`<option value="${d.id}">${d.name}</option>`));
+        }
+    });
+
+    $(document).on('change', 'select[name="dosenId2"]', function() {
+        const val = $(this).val();
+        const select1 = $('select[name="dosenId1"]');
+        const currentVal1 = select1.val();
+
+        if (val && !currentVal1) {
+            select1.empty().append('<option value="">-- Pilih Dosen Penguji 1 --</option>');
+            allDosens.forEach(d => select1.append(`<option value="${d.id}">${d.name}</option>`));
+        }
+    });
 </script>
 
 <script>

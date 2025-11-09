@@ -88,4 +88,12 @@ class DosenController extends Controller
 
         return response()->json($dosens);
     }
+
+    public function all()
+    {
+        $dosens = Dosen::orderBy('name')
+            ->get(['id', 'name', 'bidang']);
+            
+        return response()->json($dosens);
+    }
 }

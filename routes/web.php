@@ -104,4 +104,6 @@ Route::get('/skripsi/{id}/detail', [SkripsiController::class, 'getById'])->name(
 
 Route::get('/dosen/by-bidang/{bidang}', [\App\Http\Controllers\DosenController::class, 'getByBidang']);
 
+Route::get('/dosen/all', [DosenController::class, 'all']);
+
 require __DIR__.'/auth.php';
