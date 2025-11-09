@@ -20,8 +20,9 @@ class DashboardController extends Controller
             ->get()
             ->groupBy('userId');
 
-        $jadwalSeminar = Jadwal::with(['mahasiswa', 'skripsi'])
+            $jadwalSeminar = Jadwal::with(['mahasiswa', 'skripsi'])
             ->whereMonth('jadwal_seminar', $month)
+            ->whereDate('jadwal_seminar', '>=', Carbon::today())
             ->orderBy('jadwal_seminar', 'asc')
             ->get();
 
@@ -36,6 +37,7 @@ class DashboardController extends Controller
     {
         $jadwalSeminar = Jadwal::with(['mahasiswa', 'skripsi'])
             ->whereMonth('jadwal_seminar', $month)
+            ->whereDate('jadwal_seminar', '>=', Carbon::today())
             ->orderBy('jadwal_seminar', 'asc')
             ->get();
 
@@ -46,22 +48,19 @@ class DashboardController extends Controller
     {
         $year = Carbon::now()->year;
 
-        // tanggal real yang diklik
         $selectedDate = Carbon::createFromDate($year, $month, $day ?? Carbon::now()->day);
-        // nama hari, pastiin ada kapital di awal biar rapi
         $hari = ucfirst($selectedDate->locale('id')->isoFormat('dddd'));
 
-        // ambil dosen kosong sesuai hari (case-insensitive)
         $dosenKosong = JadwalDosen::with('dosen')
             ->whereRaw('LOWER(TRIM(hari)) = LOWER(TRIM(?))', [$hari])
             ->where('status', 'Kosong')
             ->get()
             ->groupBy('userId');
 
-        // ambil jadwal seminar tanggal itu
         $jadwalSeminar = Jadwal::with(['mahasiswa', 'skripsi'])
             ->whereMonth('jadwal_seminar', $month)
             ->whereDay('jadwal_seminar', $selectedDate->day)
+            ->whereDate('jadwal_seminar', '>=', Carbon::today())
             ->orderBy('jadwal_seminar', 'asc')
             ->get();
 
@@ -96,5 +95,4 @@ class DashboardController extends Controller
             'jadwalSeminar' => $jadwalSeminar,
         ]);
     }
-
 }
