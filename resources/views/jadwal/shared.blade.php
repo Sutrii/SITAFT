@@ -103,7 +103,6 @@
             border: none !important;
         }
 
-        /* Buat print version */
         @media print {
             body { background: white; padding: 0; }
             .dataTables_wrapper .dataTables_filter,
@@ -111,18 +110,54 @@
             .dataTables_info { display: none; }
             table { box-shadow: none; }
         }
+
         .dataTables_wrapper .dataTables_length,
         .dataTables_wrapper .dataTables_filter {
-            margin-top: 10px; /* jarak antara tabel dan bagian tampilkan/cari */
+            margin-top: 10px;
             margin-bottom: 20px;
         }
 
-        /* Kalau mau biar keduanya sejajar lebih elegan */
-        .dataTables_wrapper .dataTables_length {
-            float: left;
+        .dataTables_wrapper .dataTables_length { float: left; }
+        .dataTables_wrapper .dataTables_filter { float: right; }
+
+        .status-cell {
+            text-align: center;
+            vertical-align: middle;
         }
-        .dataTables_wrapper .dataTables_filter {
-            float: right;
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+            height: 28px;
+            padding: 0 10px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .status-badge.seminar-proposal {
+            background-color: #fde8e8;
+            color: #b91c1c;
+        }
+
+        .status-badge.seminar-hasil {
+            background-color: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .status-badge.sidang-akhir {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-badge.default {
+            background-color: #f3f4f6;
+            color: #374151;
         }
     </style>
 </head>
@@ -141,10 +176,13 @@
                 <th>No</th>
                 <th>Mahasiswa</th>
                 <th>Judul Skripsi</th>
+                <th>Dosen Pembimbing 1</th>
+                <th>Dosen Pembimbing 2</th>
                 <th>Dosen Penguji 1</th>
                 <th>Dosen Penguji 2</th>
                 <th>Tanggal</th>
-                <th>Jam</th>
+                <th>Jam Mulai</th>
+                <th>Jam Selesai</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -152,27 +190,22 @@
             @foreach ($jadwals as $index => $jadwal)
                 @php
                     $tanggal = \Carbon\Carbon::parse($jadwal->jadwal_seminar)->translatedFormat('d F Y');
-                    $jam = \Carbon\Carbon::parse($jadwal->jadwal_seminar)->format('H:i');
-
-                    // Style warna berdasarkan status
-                    $status = $jadwal->status;
-                    $badgeColor = match($status) {
-                        'Seminar Proposal' => 'background-color:#fde8e8; color:#b91c1c;', // Merah lembut
-                        'Seminar Hasil' => 'background-color:#e0e7ff; color:#3730a3;', // Biru lembut
-                        'Sidang Akhir' => 'background-color:#dcfce7; color:#166534;', // Hijau lembut
-                        default => 'background-color:#f3f4f6; color:#374151;'
-                    };
+                    $jamMulai = \Carbon\Carbon::parse($jadwal->jadwal_seminar)->format('H:i');
+                    $jamSelesai = \Carbon\Carbon::parse($jadwal->jadwal_seminar_selesai)->format('H:i');
                 @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $jadwal->mahasiswa->name ?? '-' }}</td>
                     <td>{{ $jadwal->skripsi->judul_skripsi ?? '-' }}</td>
+                    <td>{{ $jadwal->skripsi->dosen1->name ?? '-' }}</td>
+                    <td>{{ $jadwal->skripsi->dosen2->name ?? '-' }}</td>
                     <td>{{ $jadwal->dosen1->name ?? '-' }}</td>
                     <td>{{ $jadwal->dosen2->name ?? '-' }}</td>
                     <td>{{ $tanggal }}</td>
-                    <td>{{ $jam }}</td>
-                    <td data-status="{{ $jadwal->status }}">
-                        <span style="padding:4px 10px; border-radius:20px; font-size:0.85rem; font-weight:600; {{ $badgeColor }}">
+                    <td>{{ $jamMulai }}</td>
+                    <td>{{ $jamSelesai }}</td>
+                    <td class="status-cell" data-status="{{ $jadwal->status }}">
+                        <span class="status-badge {{ Str::slug($jadwal->status, '-') }}">
                             {{ $jadwal->status }}
                         </span>
                     </td>
@@ -180,10 +213,13 @@
             @endforeach
         </tbody>
     </table>
+
     <script>
         $(document).ready(() => {
             $('#sharedTable').DataTable({
                 pageLength: 10,
+                scrollX: true,
+                autoWidth: false,
                 language: {
                     search: "",
                     searchPlaceholder: "Cari jadwal...",

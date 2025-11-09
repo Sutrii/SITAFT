@@ -13,8 +13,15 @@ class JadwalController extends Controller
 {
     public function index()
     {
-        $jadwals = Jadwal::with(['mahasiswa', 'skripsi', 'dosen1', 'dosen2'])
-            ->orderBy('id', 'desc')->get();
+        $jadwals = Jadwal::with([
+                'mahasiswa',
+                'skripsi.dosen1',
+                'skripsi.dosen2',
+                'dosen1',
+                'dosen2'
+            ])
+            ->orderBy('id', 'desc')
+            ->get();
 
         $mahasiswas = Mahasiswa::orderBy('name')->get();
         $dosens = Dosen::orderBy('name')->get();
@@ -26,54 +33,56 @@ class JadwalController extends Controller
     public function store(Request $request)
     {
         if (Auth::user()->roleId == 1 && Auth::user()->positionId == 3) {
-            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk menambah jadwal.');
+            return back()->with('error', 'Anda tidak memiliki izin untuk menambah jadwal.');
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'skripsiId' => 'required|exists:skripsi,id',
             'mahasiswaId' => 'required|exists:mahasiswa,id',
             'dosenId1' => 'required|exists:dosen,id',
-            'dosenId2' => 'required|exists:dosen,id',
+            'dosenId2' => 'required|exists:dosen,id|different:dosenId1',
             'jadwal_seminar' => 'required|date',
+            'jadwal_seminar_selesai' => 'required|date|after_or_equal:jadwal_seminar',
             'status' => 'required|in:Seminar Proposal,Seminar Hasil,Sidang Akhir',
         ]);
 
-        Jadwal::create($request->all());
+        Jadwal::create($validated);
 
-        return redirect()->back()->with('success', 'Jadwal tugas akhir berhasil ditambahkan!');
+        return back()->with('success', 'Jadwal tugas akhir berhasil ditambahkan!');
     }
 
     public function update(Request $request, Jadwal $jadwal)
     {
         if (Auth::user()->roleId == 1 && Auth::user()->positionId == 3) {
-            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk mengubah jadwal.');
+            return back()->with('error', 'Anda tidak memiliki izin untuk mengubah jadwal.');
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'skripsiId' => 'required|exists:skripsi,id',
             'mahasiswaId' => 'required|exists:mahasiswa,id',
             'dosenId1' => 'required|exists:dosen,id',
-            'dosenId2' => 'required|exists:dosen,id',
+            'dosenId2' => 'required|exists:dosen,id|different:dosenId1',
             'jadwal_seminar' => 'required|date',
+            'jadwal_seminar_selesai' => 'required|date|after_or_equal:jadwal_seminar',
             'status' => 'required|in:Seminar Proposal,Seminar Hasil,Sidang Akhir',
         ]);
 
-        $jadwal->update($request->all());
+        $jadwal->update($validated);
 
-        return redirect()->back()->with('success', 'Jadwal berhasil diperbarui!');
+        return back()->with('success', 'Jadwal berhasil diperbarui!');
     }
 
     public function destroy(Jadwal $jadwal)
     {
         if (Auth::user()->roleId == 1 && Auth::user()->positionId == 3) {
-            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk menghapus jadwal.');
+            return back()->with('error', 'Anda tidak memiliki izin untuk menghapus jadwal.');
         }
 
         try {
             $jadwal->delete();
-            return redirect()->back()->with('success', 'Jadwal berhasil dihapus!');
+            return back()->with('success', 'Jadwal berhasil dihapus!');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus jadwal!');
+            return back()->with('error', 'Gagal menghapus jadwal!');
         }
     }
 
@@ -81,10 +90,16 @@ class JadwalController extends Controller
     {
         $status = $request->query('status');
 
-        $query = Jadwal::with(['mahasiswa', 'skripsi', 'dosen1', 'dosen2'])
-            ->whereDate('jadwal_seminar', '>=', $from)
-            ->whereDate('jadwal_seminar', '<=', $to)
-            ->orderBy('jadwal_seminar', 'asc');
+        $query = Jadwal::with([
+            'mahasiswa',
+            'skripsi.dosen1',
+            'skripsi.dosen2',
+            'dosen1',
+            'dosen2'
+        ])
+        ->whereDate('jadwal_seminar', '>=', $from)
+        ->whereDate('jadwal_seminar', '<=', $to)
+        ->orderBy('jadwal_seminar', 'asc');
 
         if ($status && $status !== 'all') {
             $query->where('status', $status);
@@ -94,5 +109,4 @@ class JadwalController extends Controller
 
         return view('jadwal.shared', compact('jadwals', 'title', 'from', 'to', 'status'));
     }
-
 }

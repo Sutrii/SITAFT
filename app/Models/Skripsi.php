@@ -9,13 +9,25 @@ class Skripsi extends Model
 {
     use HasFactory;
 
-    protected $table = 'skripsi'; // pakai tabel lama
+    protected $table = 'skripsi';
     protected $primaryKey = 'id';
-    public $timestamps = true; // aktifin biar created_at & updated_at otomatis
+    public $timestamps = true;
 
     protected $fillable = [
         'nama_mahasiswa',
         'judul_skripsi',
         'bidang',
+        'dosen_pembimbing_1',
+        'dosen_pembimbing_2',
     ];
+
+    public function dosen1()
+    {
+        return $this->belongsTo(Dosen::class, 'dosen_pembimbing_1');
+    }
+
+    public function dosen2()
+    {
+        return $this->belongsTo(Dosen::class, 'dosen_pembimbing_2');
+    }
 }

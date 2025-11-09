@@ -19,6 +19,12 @@
                 class="w-full border border-[#d8e4d8] rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#3ea76a] focus:outline-none" />
         </div>
 
+        <div>
+            <label class="block text-sm font-medium text-[#2d3a32] mb-1">Nama Dosen</label>
+            <input type="text" id="filterDosen" placeholder="Cari nama dosen..."
+                class="w-full border border-[#d8e4d8] rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#3ea76a] focus:outline-none" />
+        </div>
+
         <div class="w-full flex items-end gap-2">
             <div class="flex-1">
                 <label class="block text-sm font-medium text-[#2d3a32] mb-1">Jenis Seminar</label>
@@ -50,10 +56,13 @@
                 <th>No</th>
                 <th>Mahasiswa</th>
                 <th>Judul Skripsi</th>
-                <th>Dosen 1</th>
-                <th>Dosen 2</th>
+                <th>Dosen Pembimbing 1</th>
+                <th>Dosen Pembimbing 2</th>
+                <th>Dosen Penguji 1</th>
+                <th>Dosen Penguji 2</th>
                 <th>Tanggal</th>
-                <th>Jam</th>
+                <th>Jam Mulai</th>
+                <th>Jam Selesai</th>
                 <th>Status</th>
                 <th class="text-center aksi-col {{ Auth::user()->roleId == 1 && Auth::user()->positionId == 3 ? 'hidden' : '' }}">
                     Aksi
@@ -67,10 +76,13 @@
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $jadwal->mahasiswa->name ?? '-' }}</td>
                 <td>{{ $jadwal->skripsi->judul_skripsi ?? '-' }}</td>
+                <td>{{ $jadwal->skripsi->dosen1->name ?? '-' }}</td>
+                <td>{{ $jadwal->skripsi->dosen2->name ?? '-' }}</td>
                 <td>{{ $jadwal->dosen1->name ?? '-' }}</td>
                 <td>{{ $jadwal->dosen2->name ?? '-' }}</td>
                 <td>{{ \Carbon\Carbon::parse($jadwal->jadwal_seminar)->format('Y-m-d') }}</td>
                 <td>{{ \Carbon\Carbon::parse($jadwal->jadwal_seminar)->format('H:i') }}</td>
+                <td>{{ \Carbon\Carbon::parse($jadwal->jadwal_seminar_selesai)->format('H:i') }}</td>
                 @php
                     $status = $jadwal->status;
                     $badgeColor = match($status) {
@@ -102,7 +114,7 @@
                     @if(!(Auth::user()->roleId == 1 && Auth::user()->positionId == 3))
                         <div class="flex justify-center gap-3">
                             <button type="button" class="text-blue-500 hover:text-blue-700 transition"
-                                onclick="openEditModal('{{ $jadwal->id }}', '{{ $jadwal->mahasiswaId }}', '{{ $jadwal->skripsiId }}', '{{ $jadwal->dosenId1 }}', '{{ $jadwal->dosenId2 }}', '{{ $jadwal->jadwal_seminar }}', '{{ $jadwal->status }}')">
+                            onclick="openEditModal('{{ $jadwal->id }}','{{ $jadwal->mahasiswaId }}','{{ $jadwal->skripsiId }}','{{ $jadwal->dosenId1 }}','{{ $jadwal->dosenId2 }}','{{ $jadwal->jadwal_seminar }}','{{ $jadwal->jadwal_seminar_selesai }}','{{ $jadwal->status }}')">
                                 ✏️
                             </button>
                             <button type="button" class="text-red-500 hover:text-red-700 transition"
@@ -173,8 +185,14 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar Mulai</label>
                 <input type="datetime-local" name="jadwal_seminar" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar Selesai</label>
+                <input type="datetime-local" name="jadwal_seminar_selesai" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2">
             </div>
 
@@ -245,8 +263,14 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar Mulai</label>
                 <input type="datetime-local" name="jadwal_seminar" id="editTanggal" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar Selesai</label>
+                <input type="datetime-local" name="jadwal_seminar_selesai" id="editTanggalSelesai" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2">
             </div>
 
@@ -313,21 +337,32 @@ $(document).ready(() => {
             "<'flex justify-between items-center mb-4 flex-wrap gap-3'<'dataTables_length_wrapper'l><'dataTables_filter_wrapper'f>>" +
             "tr" +
             "<'flex justify-between items-center mt-3 flex-wrap gap-3'<'dataTables_info_wrapper'i><'dataTables_pagination_wrapper'p>>",
-        columnDefs: [
-            {
-            targets: 7,
-            render: function (data, type, row) {
-                if (type === 'display') return data;
-                return $(data).text();
-            }
-            },
-            { targets: isMahasiswa ? [] : [8], orderable: false, searchable: false },
-            { targets: isMahasiswa ? [8] : [], visible: !isMahasiswa }
-        ]
+            columnDefs: [
+                {
+                    targets: 10,    
+                    render: function (data, type, row) {
+                        if (type === 'display') return data;
+                        return $(data).text();
+                    }
+                },
+                { targets: isMahasiswa ? [] : [11], orderable: false, searchable: false },
+                { targets: isMahasiswa ? [11] : [], visible: !isMahasiswa }
+            ]
         });
 
     $('#filterNama').on('keyup', function () {
         table.column(1).search(this.value).draw();
+    });
+    $('#filterDosen').on('keyup', function () {
+        const val = this.value.trim().toLowerCase();
+
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            const pemb1 = data[3]?.toLowerCase() || '';
+            const pemb2 = data[4]?.toLowerCase() || '';
+            return val === '' || pemb1.includes(val) || pemb2.includes(val);
+        });
+
+        table.draw();
     });
     $('#filterStatus').on('change', function () {
         const val = this.value.trim();
@@ -352,14 +387,14 @@ $(document).ready(() => {
             return;
         }
 
-        const tanggalList = visibleData.map(row => row[5]);
+        const tanggalList = visibleData.map(row => row[7]);
         const sortedTanggal = tanggalList.sort((a, b) => new Date(a) - new Date(b));
         const from = sortedTanggal[0];
         const to = sortedTanggal[sortedTanggal.length - 1];
         const selectedStatus = $('#filterStatus').val() || 'all';
         const title = 'Jadwal-Seminar-Tugas-Akhir-Mahasiswa';
 
-        const url = `${window.location.origin}/jadwal/share/${title}-${from}-sampai-${to}?status=${encodeURIComponent(selectedStatus)}`;
+        const url = `${window.location.origin}/jadwal/share/${title}/${from}/${to}?status=${selectedStatus}`;
 
         navigator.clipboard.writeText(url).then(() => {
             Swal.fire({
@@ -377,7 +412,7 @@ const editModal = document.getElementById('editModal');
 const closeEditModalBtn = document.getElementById('closeEditModalBtn');
 const editForm = document.getElementById('editForm');
 
-function openEditModal(id, mahasiswaId, skripsiId, dosen1, dosen2, jadwal, status) {
+function openEditModal(id, mahasiswaId, skripsiId, dosen1, dosen2, jadwalMulai, jadwalSelesai, status) {
     Swal.fire({
         title: 'Edit Jadwal?',
         text: 'Apakah Anda yakin ingin mengubah jadwal ini?',
@@ -396,7 +431,8 @@ function openEditModal(id, mahasiswaId, skripsiId, dosen1, dosen2, jadwal, statu
             document.getElementById('editSkripsi').value = skripsiId;
             document.getElementById('editDosen1').value = dosen1;
             document.getElementById('editDosen2').value = dosen2;
-            document.getElementById('editTanggal').value = jadwal;
+            document.getElementById('editTanggal').value = jadwalMulai;
+            document.getElementById('editTanggalSelesai').value = jadwalSelesai;
             document.getElementById('editStatus').value = status;
 
             editForm.action = `/jadwal/${id}`;

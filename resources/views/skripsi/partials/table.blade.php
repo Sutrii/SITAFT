@@ -34,6 +34,8 @@
                 <th>Nama Mahasiswa</th>
                 <th>Judul Skripsi</th>
                 <th>Bidang</th>
+                <th>Dosen Pembimbing 1</th>
+                <th>Dosen Pembimbing 2</th>
                 <th>Tanggal Dibuat</th>
                 <th class="text-center">Aksi</th>
             </tr>
@@ -45,11 +47,13 @@
                     <td>{{ $skripsi->nama_mahasiswa }}</td>
                     <td>{{ $skripsi->judul_skripsi }}</td>
                     <td>{{ $skripsi->bidang }}</td>
+                    <td>{{ $skripsi->dosen1->name ?? '-' }}</td>
+                    <td>{{ $skripsi->dosen2->name ?? '-' }}</td>
                     <td>{{ $skripsi->created_at?->format('d M Y') ?? '-' }}</td>
                     <td class="text-center">
                         <div class="flex justify-center gap-3">
                             <button class="text-blue-500 hover:text-blue-700 transition"
-                                onclick="openEditModal('{{ $skripsi->id }}', '{{ $skripsi->nama_mahasiswa }}', '{{ $skripsi->judul_skripsi }}', '{{ $skripsi->bidang }}')">✏️</button>
+                            onclick="openEditModal('{{ $skripsi->id }}', '{{ $skripsi->nama_mahasiswa }}', '{{ $skripsi->judul_skripsi }}', '{{ $skripsi->bidang }}', '{{ $skripsi->dosen_pembimbing_1 }}', '{{ $skripsi->dosen_pembimbing_2 }}')">✏️</button>
                             <button class="text-red-500 hover:text-red-700 transition"
                                 onclick="confirmDelete('{{ route('skripsi.destroy', $skripsi->id) }}', '{{ $skripsi->judul_skripsi }}')">🗑️</button>
                         </div>
@@ -96,6 +100,27 @@
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400">
             </div>
 
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dosen Pembimbing 1</label>
+                    <select name="dosen_pembimbing_1" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                        <option value="">-- Pilih Dosen Pembimbing 1 --</option>
+                        @foreach ($dosens as $d)
+                            <option value="{{ $d->id }}">{{ $d->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dosen Pembimbing 2</label>
+                    <select name="dosen_pembimbing_2" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                        <option value="">-- Pilih Dosen Pembimbing 2 --</option>
+                        @foreach ($dosens as $d)
+                            <option value="{{ $d->id }}">{{ $d->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
             <div class="flex justify-end gap-2 mt-4">
                 <button type="button" id="closeModalBtn"
                     class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition">Batal</button>
@@ -138,6 +163,25 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Bidang</label>
                 <input type="text" name="bidang" id="editBidang" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dosen Pembimbing 1</label>
+                    <select name="dosen_pembimbing_1" id="editDosen1" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                        @foreach ($dosens as $d)
+                            <option value="{{ $d->id }}">{{ $d->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dosen Pembimbing 2</label>
+                    <select name="dosen_pembimbing_2" id="editDosen2" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                        @foreach ($dosens as $d)
+                            <option value="{{ $d->id }}">{{ $d->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
             <div class="flex justify-end gap-2 mt-4">
@@ -207,7 +251,7 @@ const editModal = document.getElementById('editModal');
 const closeEditModalBtn = document.getElementById('closeEditModalBtn');
 const editForm = document.getElementById('editForm');
 
-function openEditModal(id, nama, judul, bidang) {
+function openEditModal(id, nama, judul, bidang, dosen1, dosen2) {
     Swal.fire({
         title: `Edit skripsi ${nama}?`,
         text: "Apakah Anda yakin ingin mengubah data ini?",
@@ -225,6 +269,8 @@ function openEditModal(id, nama, judul, bidang) {
             document.getElementById('editNama').value = nama;
             document.getElementById('editJudul').value = judul;
             document.getElementById('editBidang').value = bidang;
+            document.getElementById('editDosen1').value = dosen1;
+            document.getElementById('editDosen2').value = dosen2;
 
             editForm.action = `/skripsi/${id}`;
         }

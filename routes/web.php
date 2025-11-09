@@ -92,7 +92,7 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/borang', [BorangController::class, 'index'])->name('borang');
 
-Route::get('/jadwal/share/{title}-{from}-sampai-{to}', [JadwalController::class, 'sharedView'])
+Route::get('/jadwal/share/{title}/{from}/{to}', [JadwalController::class, 'sharedView'])
     ->where([
         'title' => '.*',
         'from' => '\d{4}-\d{2}-\d{2}',
