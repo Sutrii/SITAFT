@@ -30,8 +30,8 @@ Route::get('/', function () {
 // Dashboard
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/month/{month}', [DashboardController::class, 'fetchMonth']);
-    Route::get('/dashboard/data/{month}/{day?}', [DashboardController::class, 'fetchData']);
+    Route::get('/dashboard/month/{month}/{year}', [DashboardController::class, 'fetchMonth']);
+    Route::get('/dashboard/data/{month}/{day}/{year}', [DashboardController::class, 'fetchData']);
     Route::get('/dashboard/data-today', [DashboardController::class, 'dataToday']);
 });
 

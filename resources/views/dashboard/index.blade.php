@@ -112,6 +112,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     let currentMonth = new Date().getMonth() + 1;
+    let currentYear = new Date().getFullYear();
     const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 
     const monthTitle = document.getElementById("monthTitle");
@@ -119,13 +120,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const seminarList = document.getElementById("seminarList");
     const dosenKosongContainer = document.getElementById("dosenKosongContainer");
 
-    const renderDashboard = async (month) => {
+    const renderDashboard = async (month, year) => {
         const today = new Date();
-        const year = today.getFullYear();
+        const displayYear = year || today.getFullYear();
         const firstDay = new Date(year, month - 1, 1).getDay();
         const daysInMonth = new Date(year, month, 0).getDate();
 
-        const res = await fetch(`/dashboard/month/${month}`);
+        const res = await fetch(`/dashboard/month/${month}/${year}`);
         const data = await res.json();
 
         monthTitle.textContent = `${bulan[month - 1]} ${year}`;
@@ -161,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     d.classList.remove("ring-2", "ring-green-500", "font-bold");
                 });
                 div.classList.add("ring-2", "ring-green-500", "font-bold");
-                loadDayData(month, day);
+                loadDayData(month, day, year);
             });
 
             calendarGrid.appendChild(div);
@@ -190,8 +191,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    async function loadDayData(month, day) {
-        const res = await fetch(`/dashboard/data/${month}/${day}`);
+    async function loadDayData(month, day, year) {
+        const res = await fetch(`/dashboard/data/${month}/${day}/${year}`);
         const { hari, tanggal, dosenKosong, jadwalSeminar } = await res.json();
 
         const title = document.getElementById("dosenTitle");
@@ -238,17 +239,24 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-
     document.getElementById("prevMonthBtn").addEventListener("click", () => {
-        currentMonth = currentMonth <= 1 ? 12 : currentMonth - 1;
-        renderDashboard(currentMonth);
+        currentMonth--;
+        if (currentMonth < 1) {
+            currentMonth = 12;
+            currentYear--;
+        }
+        renderDashboard(currentMonth, currentYear);
     });
     document.getElementById("nextMonthBtn").addEventListener("click", () => {
-        currentMonth = currentMonth >= 12 ? 1 : currentMonth + 1;
-        renderDashboard(currentMonth);
+        currentMonth++;
+        if (currentMonth > 12) {
+            currentMonth = 1;
+            currentYear++;
+        }
+        renderDashboard(currentMonth, currentYear);
     });
 
-    renderDashboard(currentMonth);
+    renderDashboard(currentMonth, currentYear);
 });
 </script>
 

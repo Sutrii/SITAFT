@@ -8,11 +8,13 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index($month = null)
+    public function index($month = null, $year = null)
     {
         $month = $month ?? Carbon::now()->month;
+        $year = $year ?? Carbon::now()->year;
+
         $today = Carbon::now()->locale('id')->isoFormat('dddd');
-        $currentMonth = Carbon::createFromDate(null, $month)->translatedFormat('F Y');
+        $currentMonth = Carbon::createFromDate($year, $month)->translatedFormat('F Y');
 
         $dosenKosong = JadwalDosen::with('dosen')
             ->whereRaw('LOWER(TRIM(hari)) = LOWER(TRIM(?))', [$today])
@@ -20,7 +22,8 @@ class DashboardController extends Controller
             ->get()
             ->groupBy('userId');
 
-            $jadwalSeminar = Jadwal::with(['mahasiswa', 'skripsi'])
+        $jadwalSeminar = Jadwal::with(['mahasiswa', 'skripsi'])
+            ->whereYear('jadwal_seminar', $year)
             ->whereMonth('jadwal_seminar', $month)
             ->whereDate('jadwal_seminar', '>=', Carbon::today())
             ->orderBy('jadwal_seminar', 'asc')
@@ -33,9 +36,10 @@ class DashboardController extends Controller
         return view('dashboard.index', compact('dosenKosong', 'jadwalSeminar', 'eventDays', 'currentMonth'));
     }
 
-    public function fetchMonth($month)
+    public function fetchMonth($month, $year)
     {
         $jadwalSeminar = Jadwal::with(['mahasiswa', 'skripsi'])
+            ->whereYear('jadwal_seminar', $year)
             ->whereMonth('jadwal_seminar', $month)
             ->whereDate('jadwal_seminar', '>=', Carbon::today())
             ->orderBy('jadwal_seminar', 'asc')
@@ -44,10 +48,8 @@ class DashboardController extends Controller
         return response()->json($jadwalSeminar);
     }
 
-    public function fetchData($month, $day = null)
+    public function fetchData($month, $day, $year)
     {
-        $year = Carbon::now()->year;
-
         $selectedDate = Carbon::createFromDate($year, $month, $day ?? Carbon::now()->day);
         $hari = ucfirst($selectedDate->locale('id')->isoFormat('dddd'));
 
@@ -58,6 +60,7 @@ class DashboardController extends Controller
             ->groupBy('userId');
 
         $jadwalSeminar = Jadwal::with(['mahasiswa', 'skripsi'])
+            ->whereYear('jadwal_seminar', $year)
             ->whereMonth('jadwal_seminar', $month)
             ->whereDay('jadwal_seminar', $selectedDate->day)
             ->whereDate('jadwal_seminar', '>=', Carbon::today())
