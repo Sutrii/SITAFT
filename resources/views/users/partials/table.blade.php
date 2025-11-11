@@ -121,6 +121,12 @@
             </div>
 
             <div id="emailPasswordAdd" class="hidden space-y-3">
+                <div id="nipFieldAdd" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
+                    <input type="text" name="nip"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none">
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                     <input type="email" name="email"
@@ -182,6 +188,12 @@
             </div>
 
             <div id="emailPasswordEdit" class="hidden space-y-3">
+                <div id="nipFieldEdit" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
+                    <input type="text" name="nip" id="editNip"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                     <input type="email" name="email" id="editEmail"
@@ -276,14 +288,24 @@ function toggleEmailPassword(type) {
     const position = document.querySelector(
         type === 'add' ? '#positionSelectAdd' : '#editPosition'
     ).value;
-    const section = document.getElementById(
+
+    const emailPasswordSection = document.getElementById(
         type === 'add' ? 'emailPasswordAdd' : 'emailPasswordEdit'
     );
+    const nipField = document.getElementById(
+        type === 'add' ? 'nipFieldAdd' : 'nipFieldEdit'
+    );
+
+    if (position === '1') {
+        nipField.classList.remove('hidden');
+    } else {
+        nipField.classList.add('hidden');
+    }
 
     if (position === '1' || (role === '1' && position === '3')) {
-        section.classList.remove('hidden');
+        emailPasswordSection.classList.remove('hidden');
     } else {
-        section.classList.add('hidden');
+        emailPasswordSection.classList.add('hidden');
     }
 }
 

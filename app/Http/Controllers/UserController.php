@@ -22,6 +22,10 @@ class UserController extends Controller
             'positionId' => 'required|in:1,2,3',
         ];
 
+        if ($request->positionId == 1) {
+            $rules['nip'] = 'required|string|max:30|unique:users,nip';
+        }
+
         if ($request->positionId == 1 || ($request->roleId == 1 && $request->positionId == 3)) {
             $rules['email'] = 'required|email|unique:users,email';
             $rules['password'] = 'required|min:6';
@@ -31,6 +35,7 @@ class UserController extends Controller
 
         User::create([
             'name' => $validated['name'],
+            'nip' => $validated['nip'] ?? null,
             'email' => $validated['email'] ?? null,
             'password' => $validated['password'] ?? null,
             'roleId' => $validated['roleId'],
@@ -48,6 +53,10 @@ class UserController extends Controller
             'positionId' => 'required|in:1,2,3',
         ];
 
+        if ($request->positionId == 1) {
+            $rules['nip'] = 'required|string|max:30|unique:users,nip,' . $user->id;
+        }
+
         if ($request->positionId == 1 || ($request->roleId == 1 && $request->positionId == 3)) {
             $rules['email'] = 'required|email|unique:users,email,' . $user->id;
             if ($request->filled('password')) {
@@ -59,6 +68,7 @@ class UserController extends Controller
 
         $updateData = [
             'name' => $validated['name'],
+            'nip' => $validated['nip'] ?? null,
             'email' => $validated['email'] ?? null,
             'roleId' => $validated['roleId'],
             'positionId' => $validated['positionId'],
