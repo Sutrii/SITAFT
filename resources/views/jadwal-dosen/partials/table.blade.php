@@ -38,7 +38,7 @@
             <select id="filterJam"
                 class="w-full border border-[#d8e4d8] rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#3ea76a] focus:outline-none">
                 <option value="">Semua Jam</option>
-                @foreach (['08.00 - 08.50', '09.40 - 10.30', '10.30 - 11.20', '13.00 - 14.00'] as $jam)
+                @foreach (['08.00 - 08.50', '09.40 - 10.30', '10.30 - 11.20', '13.00 - 14.00', '14.00 - 14.50', '14.50 - 15.40', '15.40 - 16.30', '16.30 - 17.20', '17.20 - 18.10'] as $jam)
                     <option>{{ $jam }}</option>
                 @endforeach
             </select>
@@ -120,7 +120,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Jam</label>
                 <select name="jam" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400">
-                    <option>08.00 - 08.50</option><option>09.40 - 10.30</option><option>10.30 - 11.20</option><option>13.00 - 14.00</option>
+                    <option>08.00 - 08.50</option><option>09.40 - 10.30</option><option>10.30 - 11.20</option><option>13.00 - 14.00</option><option>14.00 - 14.50</option><option>14.50 - 15.30</option><option>15.30 - 16.30</option><option>16.30 - 17.20</option><option>17.20 - 18.10</option>
                 </select>
             </div>
             <div>
