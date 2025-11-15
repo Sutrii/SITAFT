@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ str_replace('-', ' ', $title) }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/unsyiah.png') }}">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
@@ -181,8 +182,7 @@
                 <th>Dosen Penguji 1</th>
                 <th>Dosen Penguji 2</th>
                 <th>Tanggal</th>
-                <th>Jam Mulai</th>
-                <th>Jam Selesai</th>
+                <th>Waktu</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -202,8 +202,7 @@
                     <td>{{ $jadwal->dosen1->name ?? '-' }}</td>
                     <td>{{ $jadwal->dosen2->name ?? '-' }}</td>
                     <td>{{ $tanggal }}</td>
-                    <td>{{ $jamMulai }}</td>
-                    <td>{{ $jamSelesai }}</td>
+                    <td>{{ $jamMulai }} - {{ $jamSelesai }} WIB</td>
                     <td class="status-cell" data-status="{{ $jadwal->status }}">
                         <span class="status-badge {{ Str::slug($jadwal->status, '-') }}">
                             {{ $jadwal->status }}
