@@ -3,10 +3,17 @@
     <h2 class="text-2xl font-semibold text-[#2d3a32]">Jadwal Tugas Akhir</h2>
 
     @if(!(Auth::user()->roleId == 1 && Auth::user()->positionId == 3))
-        <button id="openModalBtn"
-            class="bg-[#3ea76a] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#2d8c5d] transition">
-            + Tambah Jadwal
-        </button>
+        <div class="flex items-center gap-3">
+            <button id="openImportModalBtn"
+                class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition">
+                📥 Import Excel
+            </button>
+
+            <button id="openModalBtn"
+                class="bg-[#3ea76a] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#2d8c5d] transition">
+                + Tambah Jadwal
+            </button>
+        </div>
     @endif
 </div>
 
@@ -319,6 +326,43 @@
     </div>
 </div>
 
+{{-- Modal Import --}}
+<div id="importModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+    <div class="bg-white w-[400px] rounded-2xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-5 py-3 font-semibold text-lg">
+            Import Jadwal
+        </div>
+
+        <form action="{{ route('jadwal.import') }}" method="POST" enctype="multipart/form-data" class="p-5 space-y-4">
+            @csrf
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Status Seminar</label>
+                <select name="status" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <option value="">-- Pilih Status --</option>
+                    <option value="Seminar Proposal">Seminar Proposal</option>
+                    <option value="Seminar Hasil">Seminar Hasil</option>
+                    <option value="Sidang Akhir">Sidang Akhir</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Upload File Excel</label>
+                <input type="file" name="file" required
+                    accept=".xlsx,.xls,.csv"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            </div>
+
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button" id="closeImportModalBtn"
+                    class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition">Batal</button>
+                <button type="submit"
+                    class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">Import</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
@@ -595,6 +639,44 @@ editForm?.addEventListener('submit', (e) => {
         didOpen: () => Swal.showLoading()
     });
     setTimeout(() => e.target.submit(), 700);
+});
+
+document.querySelector('#importModal form')?.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    Swal.fire({
+        title: 'Mengimpor Data...',
+        text: 'Sedang memproses file Excel. Mohon tunggu sebentar...',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    setTimeout(() => {
+        e.target.submit();
+    }, 500);
+});
+
+const importModal = document.getElementById('importModal');
+const openImportModalBtn = document.getElementById('openImportModalBtn');
+const closeImportModalBtn = document.getElementById('closeImportModalBtn');
+
+openImportModalBtn?.addEventListener('click', () => {
+    importModal.classList.remove('hidden', 'opacity-0');
+    importModal.classList.add('flex');
+});
+
+closeImportModalBtn?.addEventListener('click', () => {
+    importModal.classList.add('hidden', 'opacity-0');
+    importModal.classList.remove('flex');
+});
+
+importModal?.addEventListener('click', (e) => {
+    if (e.target === importModal) {
+        importModal.classList.add('hidden', 'opacity-0');
+        importModal.classList.remove('flex');
+    }
 });
 
 function confirmDelete(actionUrl, name) {

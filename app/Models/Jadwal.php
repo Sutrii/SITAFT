@@ -20,6 +20,7 @@ class Jadwal extends Model
         'dosenId2',
         'jadwal_seminar',
         'jadwal_seminar_selesai',
+        'ruang',
         'status',
     ];
 

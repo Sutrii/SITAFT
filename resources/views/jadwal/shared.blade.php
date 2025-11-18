@@ -183,6 +183,7 @@
                 <th>Dosen Penguji 2</th>
                 <th>Tanggal</th>
                 <th>Waktu</th>
+                <th>Ruang</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -203,6 +204,7 @@
                     <td>{{ $jadwal->dosen2->name ?? '-' }}</td>
                     <td>{{ $tanggal }}</td>
                     <td>{{ $jamMulai }} - {{ $jamSelesai }} WIB</td>
+                    <td>{{ $jadwal->ruang ?? '-' }}</td>
                     <td class="status-cell" data-status="{{ $jadwal->status }}">
                         <span class="status-badge {{ Str::slug($jadwal->status, '-') }}">
                             {{ $jadwal->status }}

@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard/month/{month}/{year}', [DashboardController::class, 'fetchMonth']);
     Route::get('/dashboard/data/{month}/{day}/{year}', [DashboardController::class, 'fetchData']);
     Route::get('/dashboard/data-today', [DashboardController::class, 'dataToday']);
+    Route::get('/dashboard/stats/penguji', [DashboardController::class, 'pengujiStats']);
 });
 
 // Jadwal Tugas Akhir
@@ -41,6 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/jadwal', [App\Http\Controllers\JadwalController::class, 'store'])->name('jadwal.store');
     Route::put('/jadwal/{jadwal}', [App\Http\Controllers\JadwalController::class, 'update'])->name('jadwal.update');
     Route::delete('/jadwal/{jadwal}', [App\Http\Controllers\JadwalController::class, 'destroy'])->name('jadwal.destroy');
+    Route::post('/jadwal/import', [App\Http\Controllers\JadwalController::class, 'import'])->name('jadwal.import');
 });
 
 // Data Jadwal Dosen

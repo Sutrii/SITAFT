@@ -104,11 +104,24 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="grid grid-cols-2 gap-6 mt-6">
+                    <div class="bg-white rounded-3xl shadow-xl p-6">
+                        <h3 class="text-lg font-semibold text-green-800 mb-4">Penguji 1</h3>
+                        <canvas id="chartPenguji1" height="200"></canvas>
+                    </div>
+
+                    <div class="bg-white rounded-3xl shadow-xl p-6">
+                        <h3 class="text-lg font-semibold text-green-800 mb-4">Penguji 2</h3>
+                        <canvas id="chartPenguji2" height="200"></canvas>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
 </x-app-layout>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     let currentMonth = new Date().getMonth() + 1;
@@ -275,6 +288,59 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!userMenu.contains(e.target)) dropdown.classList.add('hidden');
     });
   }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+
+    const res = await fetch('/dashboard/stats/penguji');
+    const data = await res.json();
+
+    const labels1 = data.penguji1.map(item => item.nama);
+    const values1 = data.penguji1.map(item => item.jumlah);
+
+    const labels2 = data.penguji2.map(item => item.nama);
+    const values2 = data.penguji2.map(item => item.jumlah);
+
+    new Chart(document.getElementById('chartPenguji1').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: labels1,
+            datasets: [{
+                label: 'Jumlah Ujian',
+                data: values1,
+                backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y', 
+            scales: {
+                x: { beginAtZero: true }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('chartPenguji2').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: labels2,
+            datasets: [{
+                label: 'Jumlah Ujian',
+                data: values2,
+                backgroundColor: 'rgba(255, 159, 64, 0.7)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y', 
+            scales: {
+                x: { beginAtZero: true }
+            }
+        }
+    });
+
 });
 </script>
 

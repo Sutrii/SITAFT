@@ -98,4 +98,36 @@ class DashboardController extends Controller
             'jadwalSeminar' => $jadwalSeminar,
         ]);
     }
+
+    public function pengujiStats()
+    {
+        $penguji1 = Jadwal::with('dosen1')
+            ->whereNotNull('dosenId1')
+            ->get()
+            ->groupBy('dosenId1')
+            ->map(function ($group) {
+                return [
+                    'nama' => $group->first()->dosen1->name ?? 'Tidak Diketahui',
+                    'jumlah' => $group->count()
+                ];
+            })
+            ->values();
+
+        $penguji2 = Jadwal::with('dosen2')
+            ->whereNotNull('dosenId2')
+            ->get()
+            ->groupBy('dosenId2')
+            ->map(function ($group) {
+                return [
+                    'nama' => $group->first()->dosen2->name ?? 'Tidak Diketahui',
+                    'jumlah' => $group->count()
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'penguji1' => $penguji1,
+            'penguji2' => $penguji2
+        ]);
+    }
 }
