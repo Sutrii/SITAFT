@@ -19,7 +19,7 @@
 
         <div class="w-full">
             <label class="block text-sm font-medium text-[#2d3a32] mb-1">NIK</label>
-            <input type="text" id="filterNik" placeholder="Cari NIK..."
+            <input type="text" id="filterNik" placeholder="Cari NIP..."
                 class="w-full border border-[#d8e4d8] rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#3ea76a] focus:outline-none" />
         </div>
     </div>
@@ -32,7 +32,7 @@
             <tr class="text-[#2d3a32] border-b border-[#e8f0e8]">
                 <th>No</th>
                 <th>Nama Dosen</th>
-                <th>NIK</th>
+                <th>NIP</th>
                 <th>Bidang</th>
                 <th>Tanggal Terdaftar</th>
                 <th class="text-center">Aksi</th>
@@ -84,7 +84,7 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">NIK</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
                 <input type="text" name="nik" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none">
             </div>
@@ -123,7 +123,7 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">NIK</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
                 <input type="text" name="nik" id="editNik" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none">
             </div>
@@ -219,7 +219,7 @@ function openEditModal(id, name, nik, bidang) {
             document.getElementById('editName').value = name;
             document.getElementById('editNik').value = nik;
             document.getElementById('editBidang').value = bidang;
-            editForm.action = `/dosen/${id}`;
+            editForm.action = `/data-dosen/${id}`;
         }
     });
 }
