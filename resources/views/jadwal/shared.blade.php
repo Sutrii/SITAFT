@@ -175,6 +175,7 @@
         <thead>
             <tr>
                 <th>No</th>
+                <th>NIM</th>
                 <th>Mahasiswa</th>
                 <th>Judul Skripsi</th>
                 <th>Dosen Pembimbing 1</th>
@@ -196,6 +197,7 @@
                 @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
+                    <td>{{ $jadwal->mahasiswa->nim ?? '-' }}</td>
                     <td>{{ $jadwal->mahasiswa->name ?? '-' }}</td>
                     <td>{{ $jadwal->skripsi->judul_skripsi ?? '-' }}</td>
                     <td>{{ $jadwal->skripsi->dosen1->name ?? '-' }}</td>
