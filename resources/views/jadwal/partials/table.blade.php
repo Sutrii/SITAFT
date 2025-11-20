@@ -225,6 +225,15 @@
                 </select>
             </div>
 
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Ruangan</label>
+                <select name="ruang" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <option value="">-- Pilih Ruangan --</option>
+                    <option value="Seminar PSTI 1">Seminar PSTI 1</option>
+                    <option value="Seminar PSTI 2">Seminar PSTI 2</option>
+                </select>
+            </div>
+
             <div class="flex justify-end gap-2 mt-4">
                 <button type="button" id="closeModalBtn"
                     class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition">Batal</button>
@@ -313,6 +322,15 @@
                     <option>Seminar Proposal</option>
                     <option>Seminar Hasil</option>
                     <option>Sidang Akhir</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Ruangan</label>
+                <select name="ruang" id="editRuang" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <option value="">-- Pilih Ruangan --</option>
+                    <option value="Seminar PSTI 1">Seminar PSTI 1</option>
+                    <option value="Seminar PSTI 2">Seminar PSTI 2</option>
                 </select>
             </div>
 
@@ -584,6 +602,7 @@ function openEditModal(id, mahasiswaId, skripsiId, dosen1, dosen2, jadwalMulai, 
             document.getElementById('editTanggal').value = jadwalMulai;
             document.getElementById('editTanggalSelesai').value = jadwalSelesai;
             document.getElementById('editStatus').value = status;
+            document.getElementById('editRuang').value = data.ruang ?? "";
 
             editForm.action = `/jadwal/${id}`;
 
