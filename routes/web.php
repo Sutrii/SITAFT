@@ -104,6 +104,8 @@ Route::get('/jadwal/share/{title}/{from}/{to}', [JadwalController::class, 'share
 
 Route::get('/skripsi/{id}/detail', [SkripsiController::class, 'getById'])->name('skripsi.detail');
 
+Route::get('/mahasiswa/{id}/skripsi', [SkripsiController::class, 'getByMahasiswa']);
+
 Route::get('/dosen/by-bidang/{bidang}', [\App\Http\Controllers\DosenController::class, 'getByBidang']);
 
 Route::get('/dosen/all', [DosenController::class, 'all']);

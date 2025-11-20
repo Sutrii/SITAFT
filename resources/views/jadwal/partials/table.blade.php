@@ -424,6 +424,31 @@ $(document).on('change', 'select[name="skripsiId"]', function() {
         .catch(err => console.error(err));
 });
 
+$(document).on('change', 'select[name="mahasiswaId"]', function() {
+    const mhsId = $(this).val();
+    if (!mhsId) return;
+
+    fetch(`/mahasiswa/${mhsId}/skripsi`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                console.warn(data.error);
+                return;
+            }
+
+            $('select[name="skripsiId"]').val(data.id).trigger("change");
+
+            $('#pembimbing1').val(data.dosen1 || '-');
+            $('#pembimbing2').val(data.dosen2 || '-');
+
+            ['#pembimbing1', '#pembimbing2'].forEach(sel => {
+                $(sel).css('box-shadow', '0 0 0 3px #bbf7d0');
+                setTimeout(() => $(sel).css('box-shadow', 'none'), 1200);
+            });
+        })
+        .catch(err => console.error(err));
+});
+
 let allDosens = [];
 
 fetch(`/dosen/all`)

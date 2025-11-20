@@ -92,4 +92,28 @@ class SkripsiController extends Controller
             ],
         ]);
     }
+
+    public function getByMahasiswa($id)
+    {
+        $mhs = Mahasiswa::find($id);
+
+        if (!$mhs) {
+            return response()->json(['error' => 'Mahasiswa tidak ditemukan'], 404);
+        }
+
+        $skripsi = Skripsi::with(['dosen1', 'dosen2'])
+            ->whereRaw('LOWER(TRIM(nama_mahasiswa)) = ?', [strtolower(trim($mhs->name))])
+            ->first();
+
+        if (!$skripsi) {
+            return response()->json(['error' => 'Mahasiswa ini belum memiliki skripsi'], 404);
+        }
+
+        return response()->json([
+            'id'    => $skripsi->id,
+            'judul' => $skripsi->judul_skripsi,
+            'dosen1' => $skripsi->dosen1->name ?? '-',
+            'dosen2' => $skripsi->dosen2->name ?? '-',
+        ]);
+    }
 }
