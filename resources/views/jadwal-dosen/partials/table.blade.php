@@ -120,7 +120,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Jam</label>
                 <select name="jam" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400">
-                    <option>08.00 - 08.50</option><option>09.40 - 10.30</option><option>10.30 - 11.20</option><option>13.00 - 14.00</option><option>14.00 - 14.50</option><option>14.50 - 15.30</option><option>15.30 - 16.30</option><option>16.30 - 17.20</option><option>17.20 - 18.10</option>
+                    <option>08.00 - 08.50</option><option>08.50 - 09.40</option><option>09.40 - 10.30</option><option>10.30 - 11.20</option><option>11.20 - 12.10</option><option>12.10 - 13.00</option><option>13.00 - 14.00</option><option>14.00 - 14.50</option><option>14.50 - 15.30</option><option>15.30 - 16.30</option><option>16.30 - 17.20</option><option>17.20 - 18.10</option>
                 </select>
             </div>
             <div>
@@ -136,6 +136,64 @@
                     class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition">Batal</button>
                 <button type="submit"
                     class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- Modal Edit --}}
+<div id="editModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+    <div class="bg-white w-[400px] rounded-2xl shadow-lg overflow-hidden">
+        <div class="bg-blue-600 text-white px-5 py-3 font-semibold text-lg">
+            Edit Jadwal Dosen
+        </div>
+
+        <form id="editForm" method="POST" class="p-5 space-y-4">
+            @csrf
+            @method('PUT')
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Dosen</label>
+                <select name="userId" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                    @foreach ($dosens as $dosen)
+                        <option value="{{ $dosen->userId }}">{{ $dosen->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Hari</label>
+                <select name="hari" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                    <option>Senin</option><option>Selasa</option><option>Rabu</option>
+                    <option>Kamis</option><option>Jumat</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Jam</label>
+                <select name="jam" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                    <option>08.00 - 08.50</option><option>08.50 - 09.40</option><option>09.40 - 10.30</option><option>10.30 - 11.20</option><option>11.20 - 12.10</option><option>12.10 - 13.00</option><option>13.00 - 14.00</option><option>14.00 - 14.50</option><option>14.50 - 15.30</option><option>15.30 - 16.30</option><option>16.30 - 17.20</option><option>17.20 - 18.10</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select name="status" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
+                    <option value="Kosong">Kosong</option>
+                    <option value="Terisi">Terisi</option>
+                </select>
+            </div>
+
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button" id="closeEditModalBtn"
+                    class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition">Batal</button>
+
+                <button type="submit"
+                    class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">Simpan</button>
             </div>
         </form>
     </div>
