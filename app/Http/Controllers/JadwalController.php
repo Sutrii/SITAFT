@@ -238,6 +238,20 @@ class JadwalController extends Controller
             $datetimeMulai   = $tanggal . ' ' . $mulai . ':00';
             $datetimeSelesai = $tanggal . ' ' . $selesai . ':00';
 
+            $cekExisting = Jadwal::where([
+                'skripsiId' => $skripsi->id,
+                'mahasiswaId' => $mahasiswa->id,
+                'dosenId1' => $penguji1->id,
+                'dosenId2' => $penguji2->id,
+            ])
+            ->where('jadwal_seminar', $datetimeMulai)
+            ->where('jadwal_seminar_selesai', $datetimeSelesai)
+            ->first();
+            
+            if ($cekExisting) {
+                continue;
+            }
+
             Jadwal::create([
                 'skripsiId'              => $skripsi->id,
                 'mahasiswaId'            => $mahasiswa->id,
