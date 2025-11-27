@@ -121,7 +121,7 @@
                     @if(!(Auth::user()->roleId == 1 && Auth::user()->positionId == 3))
                         <div class="flex justify-center gap-3">
                             <button type="button" class="text-blue-500 hover:text-blue-700 transition"
-                            onclick="openEditModal('{{ $jadwal->id }}','{{ $jadwal->mahasiswaId }}','{{ $jadwal->skripsiId }}','{{ $jadwal->dosenId1 }}','{{ $jadwal->dosenId2 }}','{{ $jadwal->jadwal_seminar }}','{{ $jadwal->jadwal_seminar_selesai }}','{{ $jadwal->status }}')">
+                            onclick="openEditModal('{{ $jadwal->id }}','{{ $jadwal->mahasiswaId }}','{{ $jadwal->skripsiId }}','{{ $jadwal->dosenId1 }}','{{ $jadwal->dosenId2 }}','{{ $jadwal->jadwal_seminar }}','{{ $jadwal->jadwal_seminar_selesai }}','{{ $jadwal->status }}','{{ $jadwal->ruang }}')">
                                 ✏️
                             </button>
                             <button type="button" class="text-red-500 hover:text-red-700 transition"
@@ -183,6 +183,18 @@
                 </div>
             </div>
 
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar Mulai</label>
+                <input type="datetime-local" name="jadwal_seminar" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar Selesai</label>
+                <input type="datetime-local" name="jadwal_seminar_selesai" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            </div>
+
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Dosen Penguji 1</label>
@@ -202,18 +214,6 @@
                         @endforeach
                     </select>
                 </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar Mulai</label>
-                <input type="datetime-local" name="jadwal_seminar" required
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2">
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar Selesai</label>
-                <input type="datetime-local" name="jadwal_seminar_selesai" required
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2">
             </div>
 
             <div>
@@ -285,6 +285,18 @@
                 </div>
             </div>
 
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar Mulai</label>
+                <input type="datetime-local" name="jadwal_seminar" id="editTanggal" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar Selesai</label>
+                <input type="datetime-local" name="jadwal_seminar_selesai" id="editTanggalSelesai" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            </div>
+
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Dosen Penguji 1</label>
@@ -302,18 +314,6 @@
                         @endforeach
                     </select>
                 </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar Mulai</label>
-                <input type="datetime-local" name="jadwal_seminar" id="editTanggal" required
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2">
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar Selesai</label>
-                <input type="datetime-local" name="jadwal_seminar_selesai" id="editTanggalSelesai" required
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2">
             </div>
 
             <div>
@@ -399,22 +399,8 @@ $(document).on('change', 'select[name="skripsiId"]', function() {
             $('#pembimbing1').val(data.dosen1.name || '-');
             $('#pembimbing2').val(data.dosen2.name || '-');
 
-            const bidang = data.bidang;
-            if (bidang) {
-                fetch(`/dosen/by-bidang/${encodeURIComponent(bidang)}`)
-                    .then(res => res.json())
-                    .then(dosens => {
-                        const selectPenguji1 = $('select[name="dosenId1"]');
-                        const selectPenguji2 = $('select[name="dosenId2"]');
-                        selectPenguji1.empty().append('<option value="">-- Pilih Dosen Penguji 1 --</option>');
-                        selectPenguji2.empty().append('<option value="">-- Pilih Dosen Penguji 2 --</option>');
-
-                        dosens.forEach(d => {
-                            selectPenguji1.append(`<option value="${d.id}">${d.name}</option>`);
-                            selectPenguji2.append(`<option value="${d.id}">${d.name}</option>`);
-                        });
-                    });
-            }
+            $('select[name="dosenId1"]').val('');
+            $('select[name="dosenId2"]').val('');
 
             ['#pembimbing1', '#pembimbing2'].forEach(sel => {
                 $(sel).css('box-shadow', '0 0 0 3px #bbf7d0');
@@ -431,20 +417,12 @@ $(document).on('change', 'select[name="mahasiswaId"]', function() {
     fetch(`/mahasiswa/${mhsId}/skripsi`)
         .then(res => res.json())
         .then(data => {
-            if (data.error) {
-                console.warn(data.error);
-                return;
-            }
+            if (data.error) return;
 
             $('select[name="skripsiId"]').val(data.id).trigger("change");
 
-            $('#pembimbing1').val(data.dosen1 || '-');
-            $('#pembimbing2').val(data.dosen2 || '-');
-
-            ['#pembimbing1', '#pembimbing2'].forEach(sel => {
-                $(sel).css('box-shadow', '0 0 0 3px #bbf7d0');
-                setTimeout(() => $(sel).css('box-shadow', 'none'), 1200);
-            });
+            $('#pembimbing1').val(data.dosen1);
+            $('#pembimbing2').val(data.dosen2);
         })
         .catch(err => console.error(err));
 });
@@ -477,6 +455,41 @@ fetch(`/dosen/all`)
             allDosens.forEach(d => select1.append(`<option value="${d.id}">${d.name}</option>`));
         }
     });
+
+    $(document).on(
+        'change',
+        'input[name="jadwal_seminar"], input[name="jadwal_seminar_selesai"]',
+        function () {
+            const tanggal = $('input[name="jadwal_seminar"]').val();
+            const tanggalSelesai = $('input[name="jadwal_seminar_selesai"]').val();
+            const skripsiId = $('select[name="skripsiId"]').val();
+
+            if (!tanggal || !tanggalSelesai || !skripsiId) return;
+
+            const url = `/skripsi/${skripsiId}/auto-penguji-by-tanggal?mulai=${encodeURIComponent(tanggal)}&selesai=${encodeURIComponent(tanggalSelesai)}`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) return;
+
+                    const selectPenguji1 = $('select[name="dosenId1"]');
+                    const selectPenguji2 = $('select[name="dosenId2"]');
+
+                    if (!selectPenguji1.find(`option[value="${data.penguji1.id}"]`).length) {
+                        selectPenguji1.append(`<option value="${data.penguji1.id}">${data.penguji1.name}</option>`);
+                    }
+                    if (!selectPenguji2.find(`option[value="${data.penguji2.id}"]`).length) {
+                        selectPenguji2.append(`<option value="${data.penguji2.id}">${data.penguji2.name}</option>`);
+                    }
+
+                    selectPenguji1.val(data.penguji1.id);
+                    selectPenguji2.val(data.penguji2.id);
+                })
+                .catch(err => console.error(err));
+        }
+    );
+
 </script>
 
 <script>
@@ -605,7 +618,7 @@ const editModal = document.getElementById('editModal');
 const closeEditModalBtn = document.getElementById('closeEditModalBtn');
 const editForm = document.getElementById('editForm');
 
-function openEditModal(id, mahasiswaId, skripsiId, dosen1, dosen2, jadwalMulai, jadwalSelesai, status) {
+function openEditModal(id, mahasiswaId, skripsiId, dosen1, dosen2, jadwalMulai, jadwalSelesai, status, ruang) {
     Swal.fire({
         title: 'Edit Jadwal?',
         text: 'Apakah Anda yakin ingin mengubah jadwal ini?',
@@ -627,7 +640,7 @@ function openEditModal(id, mahasiswaId, skripsiId, dosen1, dosen2, jadwalMulai, 
             document.getElementById('editTanggal').value = jadwalMulai;
             document.getElementById('editTanggalSelesai').value = jadwalSelesai;
             document.getElementById('editStatus').value = status;
-            document.getElementById('editRuang').value = data.ruang ?? "";
+            document.getElementById('editRuang').value = ruang || "";
 
             editForm.action = `/jadwal/${id}`;
 

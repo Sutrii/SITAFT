@@ -108,6 +108,9 @@ Route::get('/mahasiswa/{id}/skripsi', [SkripsiController::class, 'getByMahasiswa
 
 Route::get('/dosen/by-bidang/{bidang}', [\App\Http\Controllers\DosenController::class, 'getByBidang']);
 
+Route::get('/skripsi/{id}/auto-penguji', [JadwalController::class, 'autoPengujiBySkripsi']);
+Route::get('/skripsi/{id}/auto-penguji-by-tanggal', [JadwalController::class, 'autoPengujiByTanggal']);
+
 Route::get('/dosen/all', [DosenController::class, 'all']);
 
 require __DIR__.'/auth.php';

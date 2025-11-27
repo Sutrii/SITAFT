@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Jadwal;
+use App\Models\JadwalDosen; 
 use App\Models\Mahasiswa;
 use App\Models\Dosen;
 use App\Models\Skripsi;
@@ -306,6 +307,104 @@ class JadwalController extends Controller
             'name'   => $nama,
             'nik'    => null,
             'bidang' => null,
+        ]);
+    }
+
+    private function autoAssignPenguji(Skripsi $skripsi, string $mulai, string $selesai)
+    {
+        $pemb1 = $skripsi->dosen_pembimbing_1;
+        $pemb2 = $skripsi->dosen_pembimbing_2;
+
+        $bidangDosens = Dosen::where('bidang', $skripsi->bidang)
+            ->whereNotIn('id', [$pemb1, $pemb2])
+            ->inRandomOrder()
+            ->take(2)
+            ->get();
+
+        if ($bidangDosens->count() >= 2) {
+            return [
+                'dosenId1' => $bidangDosens[0]->id,
+                'dosenId2' => $bidangDosens[1]->id
+            ];
+        }
+
+        $hari = Carbon::parse($mulai)->locale('id')->dayName;
+        $seminarStart = Carbon::parse($mulai)->format('H:i');
+        $seminarEnd   = Carbon::parse($selesai)->format('H:i');
+
+        $jadwalKosong = JadwalDosen::where('hari', $hari)
+            ->where('status', 'Kosong')
+            ->get()
+            ->filter(function ($jd) use ($seminarStart, $seminarEnd) {
+
+                [$mulai, $selesai] = explode(' - ', $jd->jam);
+
+                $jamMulai = str_replace('.', ':', trim($mulai));
+                $jamSelesai = str_replace('.', ':', trim($selesai));
+
+                return !(
+                    $seminarEnd < $jamMulai ||
+                    $seminarStart > $jamSelesai
+                );
+            })
+            ->pluck('userId');
+
+        $dosenAvailable = Dosen::whereIn('userId', $jadwalKosong)
+            ->whereNotIn('id', [$pemb1, $pemb2])
+            ->inRandomOrder()
+            ->take(2)
+            ->get();
+
+        if ($dosenAvailable->count() >= 2) {
+            return [
+                'dosenId1' => $dosenAvailable[0]->id,
+                'dosenId2' => $dosenAvailable[1]->id
+            ];
+        }
+
+        $random = Dosen::whereNotIn('id', [$pemb1, $pemb2])
+            ->inRandomOrder()
+            ->take(2)
+            ->get();
+
+        return [
+            'dosenId1' => $random[0]->id ?? $pemb1,
+            'dosenId2' => $random[1]->id ?? $pemb2
+        ];
+    }
+
+    public function autoPengujiBySkripsi($skripsiId)
+    {
+        $skripsi = Skripsi::with(['dosen1', 'dosen2'])->findOrFail($skripsiId);
+
+        $mulai = now()->format('Y-m-d 00:00');
+        $selesai = now()->format('Y-m-d 00:30');
+
+        $hasil = $this->autoAssignPenguji($skripsi, $mulai, $selesai);
+
+        return response()->json([
+            'penguji1' => Dosen::find($hasil['dosenId1']),
+            'penguji2' => Dosen::find($hasil['dosenId2']),
+        ]);
+    }
+
+
+    public function autoPengujiByTanggal(Request $request, $skripsiId)
+    {
+        $skripsi = Skripsi::with(['dosen1', 'dosen2'])->findOrFail($skripsiId);
+
+        $mulai = $request->mulai;
+        $selesai = $request->selesai;
+
+        if (!$mulai || !$selesai) {
+            return response()->json(['error' => 'Tanggal & jam seminar belum lengkap'], 422);
+        }
+
+        $hasil = $this->autoAssignPenguji($skripsi, $mulai, $selesai);
+
+        return response()->json([
+            'penguji1' => Dosen::find($hasil['dosenId1']),
+            'penguji2' => Dosen::find($hasil['dosenId2']),
         ]);
     }
 }
