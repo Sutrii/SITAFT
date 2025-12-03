@@ -490,6 +490,41 @@ fetch(`/dosen/all`)
         }
     );
 
+    $(document).on('change', 'select[name="skripsiId"], select[name="status"]', function () {
+        const skripsiId = $('select[name="skripsiId"]').val();
+        const status = $('select[name="status"]').val();
+
+        if (!skripsiId) return;
+
+        if (status === 'Seminar Proposal') return;
+
+        fetch(`/skripsi/${skripsiId}/penguji-proposal`)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.exists) return;
+
+                const penguji1 = $('select[name="dosenId1"]');
+                const penguji2 = $('select[name="dosenId2"]');
+
+                if (!penguji1.find(`option[value="${data.penguji1.id}"]`).length) {
+                    penguji1.append(`<option value="${data.penguji1.id}">${data.penguji1.name}</option>`);
+                }
+                if (!penguji2.find(`option[value="${data.penguji2.id}"]`).length) {
+                    penguji2.append(`<option value="${data.penguji2.id}">${data.penguji2.name}</option>`);
+                }
+
+                penguji1.val(data.penguji1.id);
+                penguji2.val(data.penguji2.id);
+
+                penguji1.css("box-shadow", "0 0 0 3px #bbf7d0");
+                penguji2.css("box-shadow", "0 0 0 3px #bbf7d0");
+                setTimeout(() => {
+                    penguji1.css("box-shadow", "none");
+                    penguji2.css("box-shadow", "none");
+                }, 1000);
+            });
+    });
+
 </script>
 
 <script>

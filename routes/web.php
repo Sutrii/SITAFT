@@ -43,6 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/jadwal/{jadwal}', [App\Http\Controllers\JadwalController::class, 'update'])->name('jadwal.update');
     Route::delete('/jadwal/{jadwal}', [App\Http\Controllers\JadwalController::class, 'destroy'])->name('jadwal.destroy');
     Route::post('/jadwal/import', [App\Http\Controllers\JadwalController::class, 'import'])->name('jadwal.import');
+    Route::get('/skripsi/{id}/penguji-proposal', [JadwalController::class, 'getPengujiFromProposal']);
 });
 
 // Data Jadwal Dosen

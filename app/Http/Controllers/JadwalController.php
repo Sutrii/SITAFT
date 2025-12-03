@@ -402,7 +402,6 @@ class JadwalController extends Controller
         ]);
     }
 
-
     public function autoPengujiByTanggal(Request $request, $skripsiId)
     {
         $skripsi = Skripsi::with(['dosen1', 'dosen2'])->findOrFail($skripsiId);
@@ -419,6 +418,29 @@ class JadwalController extends Controller
         return response()->json([
             'penguji1' => Dosen::find($hasil['dosenId1']),
             'penguji2' => Dosen::find($hasil['dosenId2']),
+        ]);
+    }
+
+    public function getPengujiFromProposal($skripsiId)
+    {
+        $proposal = Jadwal::where('skripsiId', $skripsiId)
+            ->where('status', 'Seminar Proposal')
+            ->first();
+
+        if (!$proposal) {
+            return response()->json(['exists' => false]);
+        }
+
+        return response()->json([
+            'exists' => true,
+            'penguji1' => [
+                'id' => $proposal->dosenId1,
+                'name' => $proposal->dosen1->name ?? '-'
+            ],
+            'penguji2' => [
+                'id' => $proposal->dosenId2,
+                'name' => $proposal->dosen2->name ?? '-'
+            ],
         ]);
     }
 }
