@@ -114,4 +114,11 @@ Route::get('/skripsi/{id}/auto-penguji-by-tanggal', [JadwalController::class, 'a
 
 Route::get('/dosen/all', [DosenController::class, 'all']);
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get(
+        '/jadwal/by-mahasiswa/{mahasiswaId}',
+        [JadwalController::class, 'getJadwalByMahasiswa']
+    );
+});
+
 require __DIR__.'/auth.php';

@@ -185,13 +185,13 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar Mulai</label>
-                <input type="datetime-local" name="jadwal_seminar" required
+                <input type="datetime-local" name="jadwal_seminar" id="jadwalMulai" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2">
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal & Jam Seminar Selesai</label>
-                <input type="datetime-local" name="jadwal_seminar_selesai" required
+                <input type="datetime-local" name="jadwal_seminar_selesai" id="jadwalSelesai" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2">
             </div>
 
@@ -420,9 +420,28 @@ $(document).on('change', 'select[name="mahasiswaId"]', function() {
             if (data.error) return;
 
             $('select[name="skripsiId"]').val(data.id).trigger("change");
-
             $('#pembimbing1').val(data.dosen1);
             $('#pembimbing2').val(data.dosen2);
+        })
+        .catch(err => console.error(err));
+
+    fetch(`/jadwal/by-mahasiswa/${mhsId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (!data.exists) return;
+
+            $('#jadwalMulai').val(
+                data.jadwal_seminar.replace(' ', 'T')
+            );
+
+            $('#jadwalSelesai').val(
+                data.jadwal_seminar_selesai.replace(' ', 'T')
+            );
+
+            ['#jadwalMulai', '#jadwalSelesai'].forEach(sel => {
+                $(sel).css('box-shadow', '0 0 0 3px #bbf7d0');
+                setTimeout(() => $(sel).css('box-shadow', 'none'), 1000);
+            });
         })
         .catch(err => console.error(err));
 });

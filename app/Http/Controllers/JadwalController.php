@@ -443,4 +443,25 @@ class JadwalController extends Controller
             ],
         ]);
     }
+
+    public function getJadwalByMahasiswa($mahasiswaId)
+    {
+        $jadwal = Jadwal::where('mahasiswaId', $mahasiswaId)
+            ->whereIn('status', ['Seminar Proposal', 'Seminar Hasil'])
+            ->orderBy('jadwal_seminar', 'desc')
+            ->first();
+
+        if (!$jadwal) {
+            return response()->json([
+                'exists' => false
+            ]);
+        }
+
+        return response()->json([
+            'exists' => true,
+            'jadwal_seminar' => $jadwal->jadwal_seminar,
+            'jadwal_seminar_selesai' => $jadwal->jadwal_seminar_selesai,
+            'status' => $jadwal->status,
+        ]);
+    }
 }
