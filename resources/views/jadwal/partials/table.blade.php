@@ -490,7 +490,27 @@ fetch(`/dosen/all`)
             fetch(url)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.error) return;
+                    // Jika ada error atau penguji tidak tersedia
+                    if (data.error) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Peringatan',
+                            text: data.error,
+                            confirmButtonText: 'Oke'
+                        });
+                        return;
+                    }
+
+                    // Jika penguji1 atau penguji2 null, tampilkan warning
+                    if (!data.penguji1.id || !data.penguji2.id) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Dosen Tidak Cukup',
+                            text: 'Tidak ada cukup dosen yang tersedia pada jadwal ini. Silakan pilih manual.',
+                            confirmButtonText: 'Oke'
+                        });
+                        return;
+                    }
 
                     const selectPenguji1 = $('select[name="dosenId1"]');
                     const selectPenguji2 = $('select[name="dosenId2"]');
@@ -504,8 +524,22 @@ fetch(`/dosen/all`)
 
                     selectPenguji1.val(data.penguji1.id);
                     selectPenguji2.val(data.penguji2.id);
+
+                    // Highlight selection
+                    ['select[name="dosenId1"]', 'select[name="dosenId2"]'].forEach(sel => {
+                        $(sel).css('box-shadow', '0 0 8px rgba(62, 167, 106, 0.6)');
+                        setTimeout(() => $(sel).css('box-shadow', 'none'), 1200);
+                    });
                 })
-                .catch(err => console.error(err));
+                .catch(err => {
+                    console.error('Error fetching penguji:', err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Gagal mengambil data dosen penguji',
+                        confirmButtonText: 'Oke'
+                    });
+                });
         }
     );
 

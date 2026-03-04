@@ -329,24 +329,12 @@ class JadwalController extends Controller
         $pemb1 = $skripsi->dosen_pembimbing_1;
         $pemb2 = $skripsi->dosen_pembimbing_2;
 
-        $bidangDosens = Dosen::where('bidang', $skripsi->bidang)
-            ->whereNotIn('id', [$pemb1, $pemb2])
-            ->inRandomOrder()
-            ->take(2)
-            ->get();
-
-        if ($bidangDosens->count() >= 2) {
-            return [
-                'dosenId1' => $bidangDosens[0]->id,
-                'dosenId2' => $bidangDosens[1]->id
-            ];
-        }
-
         $hari = Carbon::parse($mulai)->locale('id')->dayName;
         $seminarStart = Carbon::parse($mulai)->format('H:i');
         $seminarEnd   = Carbon::parse($selesai)->format('H:i');
 
-        $jadwalKosong = JadwalDosen::where('hari', $hari)
+        // Get available time slots from JadwalDosen - hanya dosen yang punya jadwal terdaftar
+        $jadwalKosongUserId = JadwalDosen::where('hari', $hari)
             ->where('status', 'Kosong')
             ->get()
             ->filter(function ($jd) use ($seminarStart, $seminarEnd) {
@@ -361,29 +349,65 @@ class JadwalController extends Controller
                     $seminarStart > $jamSelesai
                 );
             })
-            ->pluck('userId');
+            ->pluck('userId')
+            ->toArray();
 
-        $dosenAvailable = Dosen::whereIn('userId', $jadwalKosong)
-            ->whereNotIn('id', [$pemb1, $pemb2])
-            ->inRandomOrder()
-            ->take(2)
-            ->get();
-
-        if ($dosenAvailable->count() >= 2) {
+        // Jika tidak ada slot kosong sama sekali, return error
+        if (empty($jadwalKosongUserId)) {
             return [
-                'dosenId1' => $dosenAvailable[0]->id,
-                'dosenId2' => $dosenAvailable[1]->id
+                'dosenId1' => null,
+                'dosenId2' => null,
+                'error' => 'Tidak ada dosen yang memiliki jadwal kosong pada hari/jam ini'
             ];
         }
 
-        $random = Dosen::whereNotIn('id', [$pemb1, $pemb2])
-            ->inRandomOrder()
-            ->take(2)
+        // Prioritas 1: Cari dosen dengan bidang yang sama DAN punya jadwal kosong
+        $bidangDosens = Dosen::where('bidang', $skripsi->bidang)
+            ->whereNotIn('id', [$pemb1, $pemb2])
+            ->whereIn('userId', $jadwalKosongUserId)
             ->get();
 
+        if ($bidangDosens->count() >= 2) {
+            return [
+                'dosenId1' => $bidangDosens[0]->id,
+                'dosenId2' => $bidangDosens[1]->id
+            ];
+        }
+
+        // Prioritas 2: Jika bidang tidak cukup, ambil dari dosen lain yang punya jadwal kosong
+        $sisaBidang = $bidangDosens->count() > 0 ? $bidangDosens->count() : 0;
+        $kurang = 2 - $sisaBidang;
+
+        $dosenLainUserId = array_diff($jadwalKosongUserId, $bidangDosens->pluck('userId')->toArray());
+        
+        $dosenLain = Dosen::whereNotIn('id', [$pemb1, $pemb2])
+            ->whereNotIn('id', $bidangDosens->pluck('id')->toArray())
+            ->whereIn('userId', $dosenLainUserId)
+            ->take($kurang)
+            ->get();
+
+        $hasilAkhir = $bidangDosens->merge($dosenLain);
+
+        if ($hasilAkhir->count() >= 2) {
+            return [
+                'dosenId1' => $hasilAkhir[0]->id,
+                'dosenId2' => $hasilAkhir[1]->id
+            ];
+        }
+
+        // Jika masih kurang dari 2 orang, cukup return yang ada
+        if ($hasilAkhir->count() == 1) {
+            return [
+                'dosenId1' => $hasilAkhir[0]->id,
+                'dosenId2' => null,
+                'error' => 'Hanya ada 1 dosen yang tersedia'
+            ];
+        }
+
         return [
-            'dosenId1' => $random[0]->id ?? $pemb1,
-            'dosenId2' => $random[1]->id ?? $pemb2
+            'dosenId1' => null,
+            'dosenId2' => null,
+            'error' => 'Tidak cukup dosen yang tersedia'
         ];
     }
 
