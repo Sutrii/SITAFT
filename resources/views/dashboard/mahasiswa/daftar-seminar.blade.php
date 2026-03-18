@@ -1,0 +1,373 @@
+<x-app-layout>
+    <div class="flex min-h-screen bg-[#fbfdfe]" id="main-container">
+        <div id="sidebar-wrapper" class="transition-all duration-300 ease-in-out">
+            @include('layouts.sidebar')
+        </div>
+
+        <div class="flex-1 flex flex-col">
+            <!-- Header -->
+            <header class="bg-white shadow-sm flex items-center justify-between px-8 py-4">
+                <div class="flex items-center gap-4">
+                    <button id="sidebar-toggle" type="button" class="p-2 hover:bg-gray-100 rounded-lg transition" title="Toggle Sidebar">
+                        <svg id="hamburger-icon" class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-700">Pendaftaran Seminar</h2>
+                        <p class="text-sm text-gray-500 mt-1">Pilih jenis seminar yang ingin Anda daftar</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button id="user-menu" type="button" class="flex items-center space-x-3 focus:outline-none group">
+                            <span class="text-gray-600 font-medium group-hover:text-green-700 transition">
+                                {{ Auth::user()->name ?? 'User' }}
+                            </span>
+                            <img class="w-9 h-9 rounded-full border border-green-200"
+                                src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'User') }}&background=16a34a&color=fff"
+                                alt="avatar">
+                            <svg class="w-4 h-4 text-gray-500 group-hover:text-green-700 transition" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        <div id="user-dropdown"
+                            class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-50">
+                            <a href="{{ route('profile.edit') }}"
+                                class="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-800 rounded-t-lg">Profil</a>
+
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit"
+                                    class="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-b-lg">
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="flex-1 overflow-auto p-8">
+                
+                @if(session('success'))
+                    <div class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
+                        <svg class="w-5 h-5 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <p class="text-sm text-green-800 font-medium">{{ session('success') }}</p>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center">
+                        <svg class="w-5 h-5 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <p class="text-sm text-red-800 font-medium">{{ session('error') }}</p>
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div class="flex items-center mb-2">
+                            <svg class="w-5 h-5 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <p class="text-sm text-red-800 font-medium">Terdapat kesalahan pada isian form:</p>
+                        </div>
+                        <ul class="list-disc pl-10 text-sm text-red-700">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <!-- Back Button -->
+                <div class="mb-6">
+                    <a href="{{ route('dashboard.mahasiswa') }}" class="inline-flex items-center text-green-600 hover:text-green-700 font-medium">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Kembali ke Dashboard
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Seminar Proposal Status -->
+                    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-blue-500 hover:shadow-lg transition">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Seminar Proposal</h3>
+                                @if($registrationStatus['seminar_proposal'])
+                                    <p class="text-green-600 text-sm font-medium mt-1">Sudah Terdaftar</p>
+                                @else
+                                    <p class="text-gray-500 text-sm mt-1">Belum Terdaftar</p>
+                                @endif
+                            </div>
+                            <div class="text-blue-500 bg-blue-50 p-3 rounded-full">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-6 h-10">Daftarkan rencana penelitian Anda untuk dievaluasi oleh dosen penguji.</p>
+                        
+                        @if($registrationStatus['seminar_proposal'])
+                            <button disabled class="w-full bg-gray-300 text-gray-500 font-medium py-2 px-4 rounded-lg cursor-not-allowed">
+                                Sudah Terdaftar
+                            </button>
+                        @else
+                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition" onclick="document.getElementById('modal-seminar-proposal').classList.remove('hidden')">
+                                Daftar Sekarang
+                            </button>
+                        @endif
+                    </div>
+
+                    <!-- Seminar Hasil Status -->
+                    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-yellow-500 hover:shadow-lg transition">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Seminar Hasil</h3>
+                                @if($registrationStatus['seminar_hasil'])
+                                    <p class="text-green-600 text-sm font-medium mt-1">Sudah Terdaftar</p>
+                                @else
+                                    <p class="text-gray-500 text-sm mt-1">Belum Terdaftar</p>
+                                @endif
+                            </div>
+                            <div class="text-yellow-500 bg-yellow-50 p-3 rounded-full">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-6 h-10">Daftarkan hasil dari penelitian skripsi Anda sebelum maju ke sidang akhir.</p>
+                        
+                        @if($registrationStatus['seminar_hasil'])
+                            <button disabled class="w-full bg-gray-300 text-gray-500 font-medium py-2 px-4 rounded-lg cursor-not-allowed">
+                                Sudah Terdaftar
+                            </button>
+                        @else
+                            <button class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg transition" onclick="alert('Fitur pendaftaran dalam pengembangan')">
+                                Daftar Sekarang
+                            </button>
+                        @endif
+                    </div>
+
+                    <!-- Sidang Status -->
+                    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-red-500 hover:shadow-lg transition">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Sidang Akhir</h3>
+                                @if($registrationStatus['sidang_akhir'])
+                                    <p class="text-green-600 text-sm font-medium mt-1">Sudah Terdaftar</p>
+                                @else
+                                    <p class="text-gray-500 text-sm mt-1">Belum Terdaftar</p>
+                                @endif
+                            </div>
+                            <div class="text-red-500 bg-red-50 p-3 rounded-full">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-6 h-10">Daftarkan sidang akhir sebagai tahap final dari tugas akhir Anda.</p>
+                        
+                        @if($registrationStatus['sidang_akhir'])
+                            <button disabled class="w-full bg-gray-300 text-gray-500 font-medium py-2 px-4 rounded-lg cursor-not-allowed">
+                                Sudah Terdaftar
+                            </button>
+                        @else
+                            <button class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition" onclick="alert('Fitur pendaftaran dalam pengembangan')">
+                                Daftar Sekarang
+                            </button>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Modal Pendaftaran Seminar Proposal -->
+                <div id="modal-seminar-proposal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+                    <!-- Background overlay -->
+                    <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onclick="document.getElementById('modal-seminar-proposal').classList.add('hidden')"></div>
+
+                    <!-- Modal panel -->
+                    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
+                        <div class="relative bg-[#fdf5e6] rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-3xl w-full border border-gray-100">
+                            
+                            <!-- Header Form Style -->
+                            <div class="bg-white p-6 border-t-[10px] border-orange-500 rounded-lg mx-6 mt-6 shadow-sm">
+                                <h2 class="text-3xl font-normal text-gray-900 mb-2">Pendaftaran Seminar Proposal</h2>
+                                <p class="text-sm text-gray-600 mb-4">Berikut Merupakan pendaftaran seminar proposal. Lakukan pengisian pendaftaran dengan sebenar-benarnya kesalahan menjadi tanggung jawab masing-masing.</p>
+                            </div>
+
+                            <form action="{{ route('mahasiswa.daftar-seminar.proposal') }}" method="POST" enctype="multipart/form-data" class="bg-transparent p-6">
+                                @csrf
+                                <div class="space-y-6">
+                                    <!-- NIM -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="nip" class="block mb-4 font-medium text-gray-800">NIM <span class="text-red-500">*</span></label>
+                                        <input type="text" id="nip" name="nip" value="{{ $mahasiswa->nip ?? Auth::user()->nip }}"readonly required class="w-1/2 border-0 border-b border-gray-300 bg-transparent px-0 py-2 focus:ring-0 focus:border-blue-600 text-gray-900 border-dotted" placeholder="Jawaban Anda">
+                                    </div>
+
+                                    <!-- Nama -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="nama" class="block mb-4 font-medium text-gray-800">Nama <span class="text-red-500">*</span></label>
+                                        <input type="text" id="nama" name="nama" value="{{ $mahasiswa->name ?? Auth::user()->name }}"readonly required class="w-1/2 border-0 border-b border-gray-300 bg-transparent px-0 py-2 focus:ring-0 focus:border-blue-600 text-gray-900 border-dotted" placeholder="Jawaban Anda">
+                                    </div>
+
+                                    <!-- Pembimbing 1 -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="pembimbing_1" class="block mb-4 font-medium text-gray-800">Pembimbing 1 <span class="text-red-500">*</span></label>
+                                        <select id="pembimbing_1" name="pembimbing_1" required class="w-1/3 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                            <option value="" disabled selected>Pilih</option>
+                                            @foreach($dosens as $dosen)
+                                                <option value="{{ $dosen->id }}">{{ $dosen->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <!-- Pembimbing 2 -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="pembimbing_2" class="block mb-4 font-medium text-gray-800">Pembimbing 2 <span class="text-red-500">*</span></label>
+                                        <select id="pembimbing_2" name="pembimbing_2" required class="w-1/3 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                                            <option value="" disabled selected>Pilih</option>
+                                            @foreach($dosens as $dosen)
+                                                <option value="{{ $dosen->id }}">{{ $dosen->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <!-- Judul Tugas Akhir -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="judul_skripsi" class="block mb-4 font-medium text-gray-800">Judul Tugas Akhir <span class="text-red-500">*</span></label>
+                                        <input type="text" id="judul_skripsi" name="judul_skripsi" required class="w-full border-0 border-b border-gray-300 bg-transparent px-0 py-2 focus:ring-0 focus:border-blue-600 text-gray-900 border-dotted" placeholder="Jawaban Anda">
+                                    </div>
+
+                                    <!-- KRS Online Terakhir -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="file_krs" class="block mb-2 font-medium text-gray-800">Upload KRS Online Terakhir</label>
+                                        <p class="text-xs text-gray-500 mb-4">Upload 1 file yang didukung: PDF. Maks 10 MB.</p>
+                                        <div class="flex items-center space-x-2 border border-gray-300 rounded px-4 py-2 w-max cursor-pointer hover:bg-gray-50 text-blue-600 font-medium text-sm bg-white" onclick="document.getElementById('file_krs').click()">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                            <span>Tambahkan file</span>
+                                        </div>
+                                        <input type="file" id="file_krs" name="file_krs" accept=".pdf" class="hidden">
+                                        <div id="file_krs_name" class="text-sm text-gray-600 mt-2"></div>
+                                    </div>
+
+                                    <!-- Lembar Pengesahan -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="file_pengesahan" class="block mb-2 font-medium text-gray-800">Upload Lembar Pengesahan <span class="text-red-500">*</span></label>
+                                        <p class="text-xs text-gray-500 mb-4">Upload 1 file yang didukung: PDF. Maks 10 MB.</p>
+                                        <div class="flex items-center space-x-2 border border-gray-300 rounded px-4 py-2 w-max cursor-pointer hover:bg-gray-50 text-blue-600 font-medium text-sm bg-white" onclick="document.getElementById('file_pengesahan').click()">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                            <span>Tambahkan file</span>
+                                        </div>
+                                        <input type="file" id="file_pengesahan" name="file_pengesahan" accept=".pdf" required class="hidden">
+                                        <div id="file_pengesahan_name" class="text-sm text-gray-600 mt-2"></div>
+                                    </div>
+
+                                    <!-- Draft Proposal Tugas Akhir -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="file_draft_proposal" class="block mb-2 font-medium text-gray-800">Upload Draft Proposal Tugas Akhir <span class="text-red-500">*</span></label>
+                                        <p class="text-xs text-gray-500 mb-4">Upload 1 file yang didukung: PDF. Maks 10 MB.</p>
+                                        <div class="flex items-center space-x-2 border border-gray-300 rounded px-4 py-2 w-max cursor-pointer hover:bg-gray-50 text-blue-600 font-medium text-sm bg-white" onclick="document.getElementById('file_draft_proposal').click()">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                            <span>Tambahkan file</span>
+                                        </div>
+                                        <input type="file" id="file_draft_proposal" name="file_draft_proposal" accept=".pdf" required class="hidden">
+                                        <div id="file_draft_proposal_name" class="text-sm text-gray-600 mt-2"></div>
+                                    </div>
+
+                                    <!-- No HP/WA -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="no_hp" class="block mb-1 font-medium text-gray-800">No HP/WA <span class="text-red-500">*</span></label>
+                                        <p class="text-sm text-gray-600 mb-4">(Data Akan disimpan secara rahasia)</p>
+                                        <input type="text" id="no_hp" name="no_hp" required class="w-1/2 border-0 border-b border-gray-300 bg-transparent px-0 py-2 focus:ring-0 focus:border-blue-600 text-gray-900 border-dotted" placeholder="Jawaban Anda">
+                                    </div>
+
+                                    <!-- Nomor Registrasi -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="no_registrasi" class="block mb-4 font-medium text-gray-800">Nomor Registrasi <span class="text-red-500">*</span></label>
+                                        <input type="text" id="no_registrasi" name="no_registrasi" required class="w-1/2 border-0 border-b border-gray-300 bg-transparent px-0 py-2 focus:ring-0 focus:border-blue-600 text-gray-900 border-dotted" placeholder="Jawaban Anda">
+                                    </div>
+                                </div>
+
+                                <!-- Form Actions -->
+                                <div class="mt-8 flex items-center justify-between">
+                                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                        Kirim
+                                    </button>
+                                    <button type="button" onclick="document.getElementById('modal-seminar-proposal').classList.add('hidden')" class="text-green-600 hover:text-green-800 font-medium text-sm transition">
+                                        Kosongkan formulir
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Update file names when selected
+        ['file_krs', 'file_pengesahan', 'file_draft_proposal'].forEach(id => {
+            const input = document.getElementById(id);
+            if(input) {
+                input.addEventListener('change', function(e) {
+                    if (e.target.files.length > 0) {
+                        document.getElementById(id + '_name').textContent = e.target.files[0].name;
+                    }
+                });
+            }
+        });
+
+        // User Menu
+        const userMenu = document.getElementById('user-menu');
+        const userDropdown = document.getElementById('user-dropdown');
+
+        userMenu?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown?.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', () => {
+            userDropdown?.classList.add('hidden');
+        });
+
+        userDropdown?.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Sidebar Toggle
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebarWrapper = document.getElementById('sidebar-wrapper');
+        let sidebarVisible = true;
+
+        sidebarToggle?.addEventListener('click', () => {
+            sidebarVisible = !sidebarVisible;
+            
+            if (sidebarVisible) {
+                sidebarWrapper.classList.remove('hidden');
+                sidebarWrapper.classList.add('w-64');
+                localStorage.setItem('sidebarVisible', 'true');
+            } else {
+                sidebarWrapper.classList.add('hidden');
+                sidebarWrapper.classList.remove('w-64');
+                localStorage.setItem('sidebarVisible', 'false');
+            }
+        });
+
+        // Restore sidebar state
+        window.addEventListener('load', () => {
+            const savedState = localStorage.getItem('sidebarVisible') !== 'false';
+            if (!savedState) {
+                sidebarWrapper.classList.add('hidden');
+                sidebarWrapper.classList.remove('w-64');
+                sidebarVisible = false;
+            }
+        });
+    </script>
+</x-app-layout>

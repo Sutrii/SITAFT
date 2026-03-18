@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MahasiswaDashboardController;
+use App\Http\Controllers\MahasiswaJadwalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\JadwalDosenController;
@@ -34,6 +36,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard/data/{month}/{day}/{year}', [DashboardController::class, 'fetchData']);
     Route::get('/dashboard/data-today', [DashboardController::class, 'dataToday']);
     Route::get('/dashboard/stats/penguji', [DashboardController::class, 'pengujiStats']);
+});
+
+// Dashboard Mahasiswa
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard/mahasiswa', [MahasiswaDashboardController::class, 'index'])->name('dashboard.mahasiswa');
+    Route::get('/dashboard/mahasiswa/jadwal', [MahasiswaJadwalController::class, 'index'])->name('mahasiswa.jadwal');
+    Route::get('/dashboard/mahasiswa/daftar-seminar', [MahasiswaDashboardController::class, 'daftarSeminar'])->name('mahasiswa.daftar-seminar');
+    Route::post('/dashboard/mahasiswa/daftar-seminar/proposal', [MahasiswaDashboardController::class, 'storeSeminarProposal'])->name('mahasiswa.daftar-seminar.proposal');
+    Route::get('/dashboard/mahasiswa/download-berita-acara', [MahasiswaDashboardController::class, 'downloadBeritaAcara'])->name('mahasiswa.download-berita-acara');
 });
 
 // Jadwal Tugas Akhir

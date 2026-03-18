@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Jadwal;
+use App\Models\JadwalDosen; 
+use App\Models\Mahasiswa;
+use App\Models\Dosen;
+use App\Models\Skripsi;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Models\User;
+
+class MahasiswaJadwalController extends Controller
+{
+    // /**
+    //  * Display jadwal seminar for mahasiswa
+    //  */
+    // public function index()
+    // {
+    //     $user = Auth::user();
+    //     $mahasiswa = $user->mahasiswa;
+
+    //     // Get jadwal for this mahasiswa
+    //     $jadwalSeminar = Jadwal::with(['mahasiswa', 'skripsi'])
+    //         ->where('mahasiswaId', $mahasiswa->id ?? null)
+    //         ->orderBy('jadwal_seminar', 'asc')
+    //         ->get();
+
+    //     return view('dashboard.mahasiswa.jadwal', compact('jadwalSeminar', 'mahasiswa'));
+    // }
+
+    public function index()
+    {
+        $user = Auth::user();
+        $mahasiswa = $user->mahasiswa;
+
+        $jadwals = Jadwal::with([
+                'mahasiswa',
+                'skripsi.dosen1',
+                'skripsi.dosen2',
+                'dosen1',
+                'dosen2'
+            ])
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $mahasiswas = Mahasiswa::orderBy('name')->get();
+        $dosens = Dosen::orderBy('name')->get();
+        $skripsis = Skripsi::orderBy('judul_skripsi')->get();
+
+        return view('dashboard.mahasiswa.jadwal', compact('jadwals', 'mahasiswa', 'mahasiswas', 'dosens', 'skripsis'));
+    }
+}

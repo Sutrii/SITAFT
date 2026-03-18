@@ -30,10 +30,12 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
+        // Mahasiswa: roleId == 1 && positionId == 3
         if ($user->roleId == 1 && $user->positionId == 3) {
-            return redirect()->intended('/jadwal');
+            return redirect()->intended('/dashboard/mahasiswa');
         }
 
+        // Dosen
         return redirect()->intended('/dashboard');
     }
 

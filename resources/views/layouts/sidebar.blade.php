@@ -20,7 +20,7 @@
 
         @if($isMahasiswaViewer)
             {{-- ==== Hanya tampilkan untuk Mahasiswa Viewer ==== --}}
-            <a href="{{ route('borang') }}"
+            <!-- <a href="{{ route('borang') }}"
                 class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
                 {{ request()->routeIs('borang') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -29,11 +29,11 @@
                         d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
                 Borang Penilaian
-            </a>
+            </a> -->
 
-            <a href="{{ route('jadwal') }}"
+            <a href="{{ route('mahasiswa.jadwal') }}"
                 class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
-                {{ request()->routeIs('jadwal') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
+                {{ request()->routeIs('mahasiswa.jadwal') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round"
