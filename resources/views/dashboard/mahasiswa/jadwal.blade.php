@@ -4,7 +4,7 @@
             @include('layouts.sidebar')
         </div>
 
-        <div class="flex-1 flex flex-col">
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             <!-- Header -->
             <header class="bg-white shadow-sm flex items-center justify-between px-8 py-4">
                 <div class="flex items-center gap-4">
@@ -53,7 +53,7 @@
             </header>
 
             <!-- Main Content -->
-            <main class="flex-1 overflow-auto p-8">
+            <main class="flex-1 overflow-y-auto overflow-x-hidden p-8 relative min-w-0 w-full">
                 
                 <!-- Back Button -->
                 <div class="mb-6">
@@ -168,6 +168,11 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="px-6 py-4 border-t border-gray-200 bg-white">
+                            {{ $jadwals->withQueryString()->links() }}
                         </div>
                     @else
                         <div class="px-6 py-12 text-center">

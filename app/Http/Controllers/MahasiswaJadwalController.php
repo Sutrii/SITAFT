@@ -45,7 +45,7 @@ class MahasiswaJadwalController extends Controller
                 'dosen2'
             ])
             ->orderBy('id', 'desc')
-            ->get();
+            ->paginate(15);
 
         $mahasiswas = Mahasiswa::orderBy('name')->get();
         $dosens = Dosen::orderBy('name')->get();
