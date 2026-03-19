@@ -45,6 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard/mahasiswa/daftar-seminar', [MahasiswaDashboardController::class, 'daftarSeminar'])->name('mahasiswa.daftar-seminar');
     Route::post('/dashboard/mahasiswa/daftar-seminar/proposal', [MahasiswaDashboardController::class, 'storeSeminarProposal'])->name('mahasiswa.daftar-seminar.proposal');
     Route::get('/dashboard/mahasiswa/download-berita-acara', [MahasiswaDashboardController::class, 'downloadBeritaAcara'])->name('mahasiswa.download-berita-acara');
+    Route::get('/dashboard/mahasiswa/panduan', [MahasiswaDashboardController::class, 'panduan'])->name('mahasiswa.panduan');
 });
 
 // Jadwal Tugas Akhir

@@ -1,18 +1,12 @@
 <x-app-layout>
     <div class="flex min-h-screen bg-[#fbfdfe]" id="main-container">
-        <div id="sidebar-wrapper" class="transition-all duration-300 ease-in-out">
-            @include('layouts.sidebar')
-        </div>
+
 
         <div class="flex-1 flex flex-col">
             <!-- Header -->
             <header class="bg-white shadow-sm flex items-center justify-between px-8 py-4">
                 <div class="flex items-center gap-4">
-                    <button id="sidebar-toggle" type="button" class="p-2 hover:bg-gray-100 rounded-lg transition" title="Toggle Sidebar">
-                        <svg id="hamburger-icon" class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
+
                     <div>
                         <h2 class="text-xl font-semibold text-gray-700">Dashboard Mahasiswa</h2>
                         <p class="text-sm text-gray-500 mt-1">Selamat datang, {{ Auth::user()->name }}</p>
@@ -148,9 +142,9 @@
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4">Panduan</h3>
                         <p class="text-gray-600 text-sm mb-6">Pelajari langkah-langkah dan persyaratan mendaftar seminar</p>
-                        <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition">
+                        <a href="{{ route('mahasiswa.panduan') }}" class="w-full block text-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition">
                             Baca Panduan
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -190,32 +184,6 @@
             e.stopPropagation();
         });
 
-        // Sidebar Toggle
-        const sidebarToggle = document.getElementById('sidebar-toggle');
-        const sidebarWrapper = document.getElementById('sidebar-wrapper');
-        const mainContainer = document.getElementById('main-container');
-        let sidebarVisible = true;
 
-        sidebarToggle?.addEventListener('click', () => {
-            sidebarVisible = !sidebarVisible;
-            
-            if (sidebarVisible) {
-                sidebarWrapper.classList.remove('hidden', 'w-0');
-                sidebarWrapper.classList.add('w-64');
-                localStorage.setItem('sidebarVisible', 'true');
-            } else {
-                sidebarWrapper.classList.add('hidden');
-                localStorage.setItem('sidebarVisible', 'false');
-            }
-        });
-
-        // Restore sidebar state
-        window.addEventListener('load', () => {
-            const savedState = localStorage.getItem('sidebarVisible') !== 'false';
-            if (!savedState) {
-                sidebarWrapper.classList.add('hidden');
-                sidebarVisible = false;
-            }
-        });
     </script>
 </x-app-layout>

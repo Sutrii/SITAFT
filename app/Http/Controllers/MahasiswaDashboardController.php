@@ -170,4 +170,12 @@ class MahasiswaDashboardController extends Controller
     {
         return view('dashboard.mahasiswa.download-berita-acara');
     }
+
+    /**
+     * Display panduan page
+     */
+    public function panduan()
+    {
+        return view('dashboard.mahasiswa.panduan');
+    }
 }

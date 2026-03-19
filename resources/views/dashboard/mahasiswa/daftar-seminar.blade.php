@@ -1,18 +1,12 @@
 <x-app-layout>
     <div class="flex min-h-screen bg-[#fbfdfe]" id="main-container">
-        <div id="sidebar-wrapper" class="transition-all duration-300 ease-in-out">
-            @include('layouts.sidebar')
-        </div>
+
 
         <div class="flex-1 flex flex-col">
             <!-- Header -->
             <header class="bg-white shadow-sm flex items-center justify-between px-8 py-4">
                 <div class="flex items-center gap-4">
-                    <button id="sidebar-toggle" type="button" class="p-2 hover:bg-gray-100 rounded-lg transition" title="Toggle Sidebar">
-                        <svg id="hamburger-icon" class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
+
                     <div>
                         <h2 class="text-xl font-semibold text-gray-700">Pendaftaran Seminar</h2>
                         <p class="text-sm text-gray-500 mt-1">Pilih jenis seminar yang ingin Anda daftar</p>
@@ -341,33 +335,6 @@
             e.stopPropagation();
         });
 
-        // Sidebar Toggle
-        const sidebarToggle = document.getElementById('sidebar-toggle');
-        const sidebarWrapper = document.getElementById('sidebar-wrapper');
-        let sidebarVisible = true;
 
-        sidebarToggle?.addEventListener('click', () => {
-            sidebarVisible = !sidebarVisible;
-            
-            if (sidebarVisible) {
-                sidebarWrapper.classList.remove('hidden');
-                sidebarWrapper.classList.add('w-64');
-                localStorage.setItem('sidebarVisible', 'true');
-            } else {
-                sidebarWrapper.classList.add('hidden');
-                sidebarWrapper.classList.remove('w-64');
-                localStorage.setItem('sidebarVisible', 'false');
-            }
-        });
-
-        // Restore sidebar state
-        window.addEventListener('load', () => {
-            const savedState = localStorage.getItem('sidebarVisible') !== 'false';
-            if (!savedState) {
-                sidebarWrapper.classList.add('hidden');
-                sidebarWrapper.classList.remove('w-64');
-                sidebarVisible = false;
-            }
-        });
     </script>
 </x-app-layout>
