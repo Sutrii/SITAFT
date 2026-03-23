@@ -394,18 +394,12 @@
                                     <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                                         <label for="bidang_hasil" class="block mb-4 font-medium text-gray-800">Bidang <span class="text-red-500">*</span></label>
                                         <div class="space-y-3">
+                                            @foreach($bidangs as $index => $bidang)
                                             <div class="flex items-center">
-                                                <input id="bidang-1" type="radio" value="Sistem Manufaktur" name="bidang" {{ (isset($skripsi) && $skripsi->bidang == 'Sistem Manufaktur') ? 'checked' : '' }} class="w-4 h-4 text-yellow-600 bg-gray-100 border-gray-300 focus:ring-yellow-500" required>
-                                                <label for="bidang-1" class="ml-2 text-sm font-medium text-gray-900">Sistem Manufaktur</label>
+                                                <input id="bidang-{{ $index }}" type="radio" value="{{ $bidang }}" name="bidang" {{ (isset($skripsi) && $skripsi->bidang == $bidang) ? 'checked' : ($index == 0 ? 'checked' : '') }} class="w-4 h-4 text-yellow-600 bg-gray-100 border-gray-300 focus:ring-yellow-500" required>
+                                                <label for="bidang-{{ $index }}" class="ml-2 text-sm font-medium text-gray-900">{{ $bidang }}</label>
                                             </div>
-                                            <div class="flex items-center">
-                                                <input id="bidang-2" type="radio" value="Sistem dan Manajemen Industri" name="bidang" {{ (isset($skripsi) && $skripsi->bidang == 'Sistem dan Manajemen Industri') ? 'checked' : '' }} class="w-4 h-4 text-yellow-600 bg-gray-100 border-gray-300 focus:ring-yellow-500">
-                                                <label for="bidang-2" class="ml-2 text-sm font-medium text-gray-900">Sistem dan Manajemen Industri</label>
-                                            </div>
-                                            <div class="flex items-center">
-                                                <input id="bidang-3" type="radio" value="Optimasi dan Sistem Informasi" name="bidang" {{ (isset($skripsi) && $skripsi->bidang == 'Optimasi dan Sistem Informasi') ? 'checked' : '' }} class="w-4 h-4 text-yellow-600 bg-gray-100 border-gray-300 focus:ring-yellow-500">
-                                                <label for="bidang-3" class="ml-2 text-sm font-medium text-gray-900">Optimasi dan Sistem Informasi</label>
-                                            </div>
+                                            @endforeach
                                         </div>
                                     </div>
 

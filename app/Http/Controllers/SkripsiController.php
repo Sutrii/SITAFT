@@ -23,7 +23,7 @@ class SkripsiController extends Controller
         $request->validate([
             'nama_mahasiswa'      => 'required|string|max:255',
             'judul_skripsi'       => 'required|string|max:255',
-            'bidang'              => 'required|string|max:255',
+            'bidang'              => 'required|exists:dosen,bidang',
             'dosen_pembimbing_1'  => 'required|exists:dosen,id',
             'dosen_pembimbing_2'  => 'required|exists:dosen,id|different:dosen_pembimbing_1',
         ]);
@@ -44,7 +44,7 @@ class SkripsiController extends Controller
         $request->validate([
             'nama_mahasiswa'      => 'required|string|max:255',
             'judul_skripsi'       => 'required|string|max:255',
-            'bidang'              => 'required|string|max:255',
+            'bidang'              => 'required|exists:dosen,bidang',
             'dosen_pembimbing_1'  => 'required|exists:dosen,id',
             'dosen_pembimbing_2'  => 'required|exists:dosen,id|different:dosen_pembimbing_1',
         ]);

@@ -82,10 +82,11 @@ class MahasiswaDashboardController extends Controller
         }
 
         $dosens = \App\Models\Dosen::all();
+        $bidangs = \App\Models\Dosen::select('bidang')->distinct()->whereNotNull('bidang')->pluck('bidang');
         $skripsi = $mahasiswa ? \App\Models\Skripsi::where('nama_mahasiswa', $mahasiswa->name)->first() : null;
         $jadwalTerakhir = $skripsi ? \App\Models\Jadwal::where('skripsiId', $skripsi->id)->latest()->first() : null;
 
-        return view('dashboard.mahasiswa.daftar-seminar', compact('mahasiswa', 'registrationStatus', 'dosens', 'skripsi', 'jadwalTerakhir'));
+        return view('dashboard.mahasiswa.daftar-seminar', compact('mahasiswa', 'registrationStatus', 'dosens', 'bidangs', 'skripsi', 'jadwalTerakhir'));
     }
 
     /**
@@ -178,7 +179,7 @@ class MahasiswaDashboardController extends Controller
             'penguji_1' => 'required|exists:dosen,id',
             'penguji_2' => 'required|exists:dosen,id',
             'judul_skripsi' => 'required|string',
-            'bidang' => 'required|in:Sistem Manufaktur,Sistem dan Manajemen Industri,Optimasi dan Sistem Informasi',
+            'bidang' => 'required|exists:dosen,bidang',
             'file_krs' => 'nullable|mimes:pdf|max:10240',
             'file_persetujuan_hasil' => 'required|mimes:pdf|max:10240',
             'file_draft_skripsi' => 'nullable|mimes:pdf|max:10240',
