@@ -19,6 +19,8 @@ class Skripsi extends Model
         'bidang',
         'dosen_pembimbing_1',
         'dosen_pembimbing_2',
+        'dosen_penguji_1',
+        'dosen_penguji_2',
     ];
 
     public function dosen1()
@@ -29,5 +31,15 @@ class Skripsi extends Model
     public function dosen2()
     {
         return $this->belongsTo(Dosen::class, 'dosen_pembimbing_2');
+    }
+
+    public function penguji1()
+    {
+        return $this->belongsTo(Dosen::class, 'dosen_penguji_1');
+    }
+
+    public function penguji2()
+    {
+        return $this->belongsTo(Dosen::class, 'dosen_penguji_2');
     }
 }

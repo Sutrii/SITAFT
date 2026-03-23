@@ -81,8 +81,18 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-gray-500 text-sm font-medium">Seminar Hasil</p>
-                                <p class="text-3xl font-bold text-gray-800 mt-2">-</p>
-                                <p class="text-gray-400 text-xs mt-2">Status: Belum Terdaftar</p>
+                                @if($registrationStatus['seminar_hasil'])
+                                    @php
+                                        $statusClass = 'text-green-500';
+                                        if ($registrationStatus['seminar_hasil']->status == 'pending') $statusClass = 'text-yellow-500';
+                                        elseif ($registrationStatus['seminar_hasil']->status == 'ditolak' || $registrationStatus['seminar_hasil']->status == 'revisi') $statusClass = 'text-red-500';
+                                    @endphp
+                                    <p class="text-3xl font-bold text-gray-800 mt-2 uppercase">{{ $registrationStatus['seminar_hasil']->status }}</p>
+                                    <p class="{{ $statusClass }} text-xs mt-2 font-medium">Status: Sudah Terdaftar</p>
+                                @else
+                                    <p class="text-3xl font-bold text-gray-800 mt-2">-</p>
+                                    <p class="text-gray-400 text-xs mt-2">Status: Belum Terdaftar</p>
+                                @endif
                             </div>
                             <div class="text-yellow-500">
                                 <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,8 +107,18 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-gray-500 text-sm font-medium">Sidang</p>
-                                <p class="text-3xl font-bold text-gray-800 mt-2">-</p>
-                                <p class="text-gray-400 text-xs mt-2">Status: Belum Terdaftar</p>
+                                @if($registrationStatus['sidang_akhir'])
+                                    @php
+                                        $statusClass = 'text-green-500';
+                                        if ($registrationStatus['sidang_akhir']->status == 'pending') $statusClass = 'text-yellow-500';
+                                        elseif ($registrationStatus['sidang_akhir']->status == 'ditolak' || $registrationStatus['sidang_akhir']->status == 'revisi') $statusClass = 'text-red-500';
+                                    @endphp
+                                    <p class="text-3xl font-bold text-gray-800 mt-2 uppercase">{{ $registrationStatus['sidang_akhir']->status }}</p>
+                                    <p class="{{ $statusClass }} text-xs mt-2 font-medium">Status: Sudah Terdaftar</p>
+                                @else
+                                    <p class="text-3xl font-bold text-gray-800 mt-2">-</p>
+                                    <p class="text-gray-400 text-xs mt-2">Status: Belum Terdaftar</p>
+                                @endif
                             </div>
                             <div class="text-red-500">
                                 <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">

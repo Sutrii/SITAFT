@@ -13,24 +13,27 @@ class JadwalDosenController extends Controller
         $jadwals = JadwalDosen::with('dosen')->orderBy('id', 'desc')->get();
         $dosens = Dosen::orderBy('name', 'asc')->get();
 
-        return view('jadwal-dosen.index', compact('jadwals', 'dosens'));
+        return view('dashboard.koordinator.jadwal-dosen.index', compact('jadwals', 'dosens'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'userId' => 'required|exists:dosen,userId',
-            'hari'   => 'required|string|max:50',
-            'jam'    => 'required|string|max:50',
-            'status' => 'required|in:Kosong,Terisi',
+            'jadwal' => 'required|array|min:1',
+            'jadwal.*.hari'   => 'required|string|max:50',
+            'jadwal.*.jam'    => 'required|string|max:50',
+            'jadwal.*.status' => 'required|in:Kosong,Terisi',
         ]);
 
-        JadwalDosen::create([
-            'userId' => $request->userId,
-            'hari'   => $request->hari,
-            'jam'    => $request->jam,
-            'status' => $request->status,
-        ]);
+        foreach ($request->jadwal as $sesi) {
+            JadwalDosen::create([
+                'userId' => $request->userId,
+                'hari'   => $sesi['hari'],
+                'jam'    => $sesi['jam'],
+                'status' => $sesi['status'],
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Jadwal dosen berhasil ditambahkan!');
     }

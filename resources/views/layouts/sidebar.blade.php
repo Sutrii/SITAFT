@@ -43,9 +43,9 @@
             </a>
         @else
             {{-- ==== Menu default untuk Admin, Koordinator, Dosen, dll ==== --}}
-            <a href="{{ route('dashboard') }}"
+            <a href="{{ route('koordinator.dashboard') }}"
                 class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
-                {{ request()->routeIs('dashboard') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
+                {{ request()->routeIs('koordinator.dashboard') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -54,9 +54,9 @@
                 Dashboard
             </a>
 
-            <a href="{{ route('jadwal') }}"
+            <a href="{{ route('koordinator.jadwal') }}"
                 class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
-                {{ request()->routeIs('jadwal') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
+                {{ request()->routeIs('koordinator.jadwal') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -65,9 +65,9 @@
                 Jadwal Tugas Akhir
             </a>
 
-            <a href="{{ route('skripsi') }}"
+            <a href="{{ route('koordinator.skripsi') }}"
                 class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
-                {{ request()->routeIs('skripsi') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
+                {{ request()->routeIs('koordinator.skripsi') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -76,9 +76,9 @@
                 Data Skripsi Mahasiswa
             </a>
 
-            <a href="{{ route('jadwal-dosen') }}"
+            <a href="{{ route('koordinator.jadwal-dosen') }}"
                 class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
-                {{ request()->routeIs('jadwal-dosen') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
+                {{ request()->routeIs('koordinator.jadwal-dosen') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -87,9 +87,9 @@
                 Jadwal Dosen
             </a>
 
-            <a href="{{ route('data-dosen') }}"
+            <a href="{{ route('koordinator.data-dosen') }}"
                 class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
-                {{ request()->routeIs('data-dosen') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
+                {{ request()->routeIs('koordinator.data-dosen') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -98,9 +98,9 @@
                 Data Dosen
             </a>
 
-            <a href="{{ route('mahasiswa') }}"
+            <a href="{{ route('koordinator.mahasiswa') }}"
                 class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
-                {{ request()->routeIs('mahasiswa') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
+                {{ request()->routeIs('koordinator.mahasiswa') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -109,9 +109,9 @@
                 Data Mahasiswa
             </a>
 
-            <a href="{{ route('users') }}"
+            <a href="{{ route('koordinator.users') }}"
                 class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all
-                {{ request()->routeIs('users') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
+                {{ request()->routeIs('koordinator.users') ? 'text-[#3ea76a]' : 'hover:text-[#3ea76a] text-[#2d3a32]' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round"

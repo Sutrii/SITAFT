@@ -11,16 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pendaftaran_seminars', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->onDelete('cascade');
-            $table->foreignId('skripsi_id')->constrained('skripsi')->onDelete('cascade');
-            $table->enum('jenis_seminar', ['seminar_proposal', 'seminar_hasil', 'sidang_akhir']);
-            $table->enum('status', ['pending', 'revisi', 'disetujui', 'ditolak'])->default('pending');
-            $table->string('file_persyaratan', 255)->nullable();
-            $table->text('catatan')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('pendaftaran_seminar')) {
+            Schema::create('pendaftaran_seminar', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->onDelete('cascade');
+                $table->foreignId('skripsi_id')->constrained('skripsi')->onDelete('cascade');
+                $table->string('nomor_registrasi')->nullable();
+                $table->string('no_hp')->nullable();
+                $table->enum('jenis_seminar', ['seminar_proposal', 'seminar_hasil', 'sidang_akhir']);
+                $table->enum('status', ['pending', 'revisi', 'disetujui', 'ditolak', 'acc'])->default('pending');
+                $table->string('file_persyaratan', 255)->nullable();
+                $table->text('catatan')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -28,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pendaftaran_seminars');
+        Schema::dropIfExists('pendaftaran_seminar');
     }
 };

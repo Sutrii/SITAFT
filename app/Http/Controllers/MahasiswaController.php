@@ -10,7 +10,7 @@ class MahasiswaController extends Controller
     public function index()
     {
         $mahasiswas = Mahasiswa::orderBy('id', 'desc')->get();
-        return view('mahasiswa.index', compact('mahasiswas'));
+        return view('dashboard.koordinator.mahasiswa.index', compact('mahasiswas'));
     }
 
     public function store(Request $request)

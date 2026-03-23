@@ -29,69 +29,75 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
-// Dashboard
+// Dashboard Router
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/month/{month}/{year}', [DashboardController::class, 'fetchMonth']);
-    Route::get('/dashboard/data/{month}/{day}/{year}', [DashboardController::class, 'fetchData']);
-    Route::get('/dashboard/data-today', [DashboardController::class, 'dataToday']);
-    Route::get('/dashboard/stats/penguji', [DashboardController::class, 'pengujiStats']);
+    Route::get('/dashboard', function () {
+        $user = Auth::user();
+        if ($user->roleId == 1 && $user->positionId == 3) {
+            return redirect()->route('dashboard.mahasiswa');
+        }
+        return redirect()->route('koordinator.dashboard');
+    })->name('dashboard');
 });
 
 // Dashboard Mahasiswa
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:mahasiswa'])->group(function () {
     Route::get('/dashboard/mahasiswa', [MahasiswaDashboardController::class, 'index'])->name('dashboard.mahasiswa');
     Route::get('/dashboard/mahasiswa/jadwal', [MahasiswaJadwalController::class, 'index'])->name('mahasiswa.jadwal');
     Route::get('/dashboard/mahasiswa/daftar-seminar', [MahasiswaDashboardController::class, 'daftarSeminar'])->name('mahasiswa.daftar-seminar');
     Route::post('/dashboard/mahasiswa/daftar-seminar/proposal', [MahasiswaDashboardController::class, 'storeSeminarProposal'])->name('mahasiswa.daftar-seminar.proposal');
+    Route::post('/dashboard/mahasiswa/daftar-seminar/hasil', [MahasiswaDashboardController::class, 'storeSeminarHasil'])->name('mahasiswa.daftar-seminar.hasil');
     Route::get('/dashboard/mahasiswa/download-berita-acara', [MahasiswaDashboardController::class, 'downloadBeritaAcara'])->name('mahasiswa.download-berita-acara');
     Route::get('/dashboard/mahasiswa/panduan', [MahasiswaDashboardController::class, 'panduan'])->name('mahasiswa.panduan');
 });
 
-// Jadwal Tugas Akhir
-Route::middleware(['auth', 'verified'])->group(function () {
+// Dashboard Koordinator & Data Master
+Route::middleware(['auth', 'verified', 'role:koordinator'])->prefix('dashboard/koordinator')->name('koordinator.')->group(function () {
+    
+    // Dashboard Stats & API
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/month/{month}/{year}', [DashboardController::class, 'fetchMonth']);
+    Route::get('/data/{month}/{day}/{year}', [DashboardController::class, 'fetchData']);
+    Route::get('/data-today', [DashboardController::class, 'dataToday']);
+    Route::get('/stats/penguji', [DashboardController::class, 'pengujiStats']);
+
+    // Request Seminar
+    Route::get('/request-seminar', [\App\Http\Controllers\KoordinatorSeminarController::class, 'index'])->name('request-seminar');
+    Route::post('/request-seminar/{id}/status', [\App\Http\Controllers\KoordinatorSeminarController::class, 'updateStatus'])->name('request-seminar.update-status');
+
+    // Jadwal Tugas Akhir
     Route::get('/jadwal', [App\Http\Controllers\JadwalController::class, 'index'])->name('jadwal');
     Route::post('/jadwal', [App\Http\Controllers\JadwalController::class, 'store'])->name('jadwal.store');
     Route::put('/jadwal/{jadwal}', [App\Http\Controllers\JadwalController::class, 'update'])->name('jadwal.update');
     Route::delete('/jadwal/{jadwal}', [App\Http\Controllers\JadwalController::class, 'destroy'])->name('jadwal.destroy');
     Route::post('/jadwal/import', [App\Http\Controllers\JadwalController::class, 'import'])->name('jadwal.import');
     Route::get('/skripsi/{id}/penguji-proposal', [JadwalController::class, 'getPengujiFromProposal']);
-});
 
-// Data Jadwal Dosen
-Route::middleware(['auth', 'verified'])->group(function () {
+    // Data Jadwal Dosen
     Route::get('/jadwal-dosen', [App\Http\Controllers\JadwalDosenController::class, 'index'])->name('jadwal-dosen');
     Route::post('/jadwal-dosen', [App\Http\Controllers\JadwalDosenController::class, 'store'])->name('jadwal-dosen.store');
     Route::put('/jadwal-dosen/{jadwal}', [App\Http\Controllers\JadwalDosenController::class, 'update'])->name('jadwal-dosen.update');
     Route::delete('/jadwal-dosen/{jadwal}', [App\Http\Controllers\JadwalDosenController::class, 'destroy'])->name('jadwal-dosen.destroy');
-});
 
-// Data Skripsi Mahasiswa
-Route::middleware(['auth', 'verified'])->group(function () {
+    // Data Skripsi Mahasiswa
     Route::get('/skripsi', [App\Http\Controllers\SkripsiController::class, 'index'])->name('skripsi');
     Route::post('/skripsi', [App\Http\Controllers\SkripsiController::class, 'store'])->name('skripsi.store');
     Route::put('/skripsi/{skripsi}', [App\Http\Controllers\SkripsiController::class, 'update'])->name('skripsi.update');
     Route::delete('/skripsi/{skripsi}', [App\Http\Controllers\SkripsiController::class, 'destroy'])->name('skripsi.destroy');
-});
 
-// Data Dosen
-Route::middleware(['auth', 'verified'])->group(function () {
+    // Data Dosen
     Route::get('/data-dosen', [App\Http\Controllers\DosenController::class, 'index'])->name('data-dosen');
     Route::post('/data-dosen', [App\Http\Controllers\DosenController::class, 'store'])->name('dosen.store');
     Route::put('/data-dosen/{dosen}', [App\Http\Controllers\DosenController::class, 'update'])->name('dosen.update');
     Route::delete('/data-dosen/{dosen}', [App\Http\Controllers\DosenController::class, 'destroy'])->name('dosen.destroy');
-});
 
-// Data Mahasiswa
-Route::middleware(['auth', 'verified'])->group(function () {
+    // Data Mahasiswa
     Route::get('/mahasiswa', [MahasiswaController::class, 'index'])->name('mahasiswa');
     Route::post('/mahasiswa', [MahasiswaController::class, 'store'])->name('mahasiswa.store');
     Route::put('/mahasiswa/{mahasiswa}', [MahasiswaController::class, 'update'])->name('mahasiswa.update');
     Route::delete('/mahasiswa/{mahasiswa}', [MahasiswaController::class, 'destroy'])->name('mahasiswa.destroy');
-});
 
-// Data Pengguna
-Route::middleware(['auth', 'verified'])->group(function () {
+    // Data Pengguna
     Route::get('/users', [UserController::class, 'index'])->name('users');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
@@ -122,7 +128,7 @@ Route::get('/mahasiswa/{id}/skripsi', [SkripsiController::class, 'getByMahasiswa
 Route::get('/dosen/by-bidang/{bidang}', [\App\Http\Controllers\DosenController::class, 'getByBidang']);
 
 Route::get('/skripsi/{id}/auto-penguji', [JadwalController::class, 'autoPengujiBySkripsi']);
-Route::get('/skripsi/{id}/auto-penguji-by-tanggal', [JadwalController::class, 'autoPengujiByTanggal']);
+Route::get('/skripsi/{id}/available-slots', [JadwalController::class, 'getAvailableSlots']);
 
 Route::get('/dosen/all', [DosenController::class, 'all']);
 

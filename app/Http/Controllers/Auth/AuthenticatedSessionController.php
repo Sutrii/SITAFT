@@ -20,9 +20,6 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
-    /**
-     * Handle an incoming authentication request.
-     */
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
@@ -32,10 +29,27 @@ class AuthenticatedSessionController extends Controller
 
         // Mahasiswa: roleId == 1 && positionId == 3
         if ($user->roleId == 1 && $user->positionId == 3) {
+            if (!$user->mahasiswa) {
+                Auth::guard('web')->logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return redirect()->route('login')->withErrors(['email' => 'Akun Mahasiswa tidak valid/ditemukan.']);
+            }
             return redirect()->intended('/dashboard/mahasiswa');
         }
 
-        // Dosen
+        // Koordinator (Asumsi menggunakan roleId 2 atau positionId 1)
+        if ($user->roleId == 2 || $user->positionId == 1) {
+            if (!$user->koordinator) {
+                Auth::guard('web')->logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return redirect()->route('login')->withErrors(['email' => 'Akun Koordinator belum diverifikasi di sistem.']);
+            }
+            return redirect()->intended('/dashboard/koordinator');
+        }
+
+        // Dosen & Lainnya
         return redirect()->intended('/dashboard');
     }
 

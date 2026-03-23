@@ -10,7 +10,7 @@ class DosenController extends Controller
     public function index()
     {
         $dosens = Dosen::orderBy('id', 'desc')->get();
-        return view('dosen.index', compact('dosens'));
+        return view('dashboard.koordinator.dosen.index', compact('dosens'));
     }
 
     public function store(Request $request)

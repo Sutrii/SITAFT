@@ -15,7 +15,7 @@ class SkripsiController extends Controller
         $skripsis = Skripsi::orderBy('id', 'desc')->get();
         $mahasiswas = Mahasiswa::orderBy('name')->get();
         $dosens = Dosen::orderBy('name')->get();
-        return view('skripsi.index', compact('skripsis', 'mahasiswas', 'dosens'));
+        return view('dashboard.koordinator.skripsi.index', compact('skripsis', 'mahasiswas', 'dosens'));
     }
 
     public function store(Request $request)
@@ -72,7 +72,7 @@ class SkripsiController extends Controller
 
     public function getById($id)
     {
-        $skripsi = Skripsi::with(['dosen1', 'dosen2'])->find($id);
+        $skripsi = Skripsi::with(['dosen1', 'dosen2', 'penguji1', 'penguji2'])->find($id);
 
         if (!$skripsi) {
             return response()->json(['error' => 'Data tidak ditemukan'], 404);
@@ -89,6 +89,14 @@ class SkripsiController extends Controller
             'dosen2' => [
                 'id' => $skripsi->dosen2->id ?? null,
                 'name' => $skripsi->dosen2->name ?? '-'
+            ],
+            'penguji1' => [
+                'id' => $skripsi->penguji1->id ?? null,
+                'name' => $skripsi->penguji1->name ?? null
+            ],
+            'penguji2' => [
+                'id' => $skripsi->penguji2->id ?? null,
+                'name' => $skripsi->penguji2->name ?? null
             ],
         ]);
     }

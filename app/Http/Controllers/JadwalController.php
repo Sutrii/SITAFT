@@ -27,11 +27,19 @@ class JadwalController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        $mahasiswas = Mahasiswa::orderBy('name')->get();
-        $dosens = Dosen::orderBy('name')->get();
-        $skripsis = Skripsi::orderBy('judul_skripsi')->get();
+        $accPendaftaran = \App\Models\PendaftaranSeminar::where('status', 'acc')->get();
+        $mahasiswaIds = $accPendaftaran->pluck('mahasiswa_id')->unique();
+        $skripsiIds = $accPendaftaran->pluck('skripsi_id')->unique();
 
-        return view('jadwal.index', compact('jadwals', 'mahasiswas', 'dosens', 'skripsis'));
+        $mahasiswas = Mahasiswa::whereIn('id', $mahasiswaIds)->orderBy('name')->get()->map(function($m) use ($accPendaftaran) {
+            $latest = $accPendaftaran->where('mahasiswa_id', $m->id)->sortByDesc('created_at')->first();
+            $m->jenis_seminar = $latest ? $latest->jenis_seminar : null;
+            return $m;
+        });
+        $dosens = Dosen::orderBy('name')->get();
+        $skripsis = Skripsi::whereIn('id', $skripsiIds)->orderBy('judul_skripsi')->get();
+
+        return view('dashboard.koordinator.jadwal.index', compact('jadwals', 'mahasiswas', 'dosens', 'skripsis'));
     }
 
     public function store(Request $request)
@@ -40,18 +48,35 @@ class JadwalController extends Controller
             return back()->with('error', 'Anda tidak memiliki izin untuk menambah jadwal.');
         }
 
-        $validated = $request->validate([
+        $request->validate([
             'skripsiId' => 'required|exists:skripsi,id',
             'mahasiswaId' => 'required|exists:mahasiswa,id',
             'dosenId1' => 'required|exists:dosen,id',
             'dosenId2' => 'required|exists:dosen,id|different:dosenId1',
-            'jadwal_seminar' => 'required|date',
-            'jadwal_seminar_selesai' => 'required|date|after_or_equal:jadwal_seminar',
+            'tanggal_seminar' => 'required|date',
+            'jam_seminar' => 'required|string',
             'ruang' => 'nullable|string|max:255',
             'status' => 'required|in:Seminar Proposal,Seminar Hasil,Sidang Akhir',
         ]);
 
-        Jadwal::create($validated);
+        [$mulai, $selesai] = explode(' - ', $request->jam_seminar);
+        
+        $jamMulai = str_replace('.', ':', trim($mulai)) . ':00';
+        $jamSelesai = str_replace('.', ':', trim($selesai)) . ':00';
+
+        $jadwal_seminar = Carbon::parse($request->tanggal_seminar . ' ' . $jamMulai)->format('Y-m-d H:i:s');
+        $jadwal_seminar_selesai = Carbon::parse($request->tanggal_seminar . ' ' . $jamSelesai)->format('Y-m-d H:i:s');
+
+        Jadwal::create([
+            'skripsiId' => $request->skripsiId,
+            'mahasiswaId' => $request->mahasiswaId,
+            'dosenId1' => $request->dosenId1,
+            'dosenId2' => $request->dosenId2,
+            'jadwal_seminar' => $jadwal_seminar,
+            'jadwal_seminar_selesai' => $jadwal_seminar_selesai,
+            'ruang' => $request->ruang,
+            'status' => $request->status,
+        ]);
 
         return back()->with('success', 'Jadwal tugas akhir berhasil ditambahkan!');
     }
@@ -62,18 +87,35 @@ class JadwalController extends Controller
             return back()->with('error', 'Anda tidak memiliki izin untuk mengubah jadwal.');
         }
 
-        $validated = $request->validate([
+        $request->validate([
             'skripsiId' => 'required|exists:skripsi,id',
             'mahasiswaId' => 'required|exists:mahasiswa,id',
             'dosenId1' => 'required|exists:dosen,id',
             'dosenId2' => 'required|exists:dosen,id|different:dosenId1',
-            'jadwal_seminar' => 'required|date',
-            'jadwal_seminar_selesai' => 'required|date|after_or_equal:jadwal_seminar',
+            'tanggal_seminar' => 'required|date',
+            'jam_seminar' => 'required|string',
             'ruang' => 'nullable|string|max:255',
             'status' => 'required|in:Seminar Proposal,Seminar Hasil,Sidang Akhir',
         ]);
 
-        $jadwal->update($validated);
+        [$mulai, $selesai] = explode(' - ', $request->jam_seminar);
+        
+        $jamMulai = str_replace('.', ':', trim($mulai)) . ':00';
+        $jamSelesai = str_replace('.', ':', trim($selesai)) . ':00';
+
+        $jadwal_seminar = Carbon::parse($request->tanggal_seminar . ' ' . $jamMulai)->format('Y-m-d H:i:s');
+        $jadwal_seminar_selesai = Carbon::parse($request->tanggal_seminar . ' ' . $jamSelesai)->format('Y-m-d H:i:s');
+
+        $jadwal->update([
+            'skripsiId' => $request->skripsiId,
+            'mahasiswaId' => $request->mahasiswaId,
+            'dosenId1' => $request->dosenId1,
+            'dosenId2' => $request->dosenId2,
+            'jadwal_seminar' => $jadwal_seminar,
+            'jadwal_seminar_selesai' => $jadwal_seminar_selesai,
+            'ruang' => $request->ruang,
+            'status' => $request->status,
+        ]);
 
         return back()->with('success', 'Jadwal berhasil diperbarui!');
     }
@@ -113,7 +155,7 @@ class JadwalController extends Controller
 
         $jadwals = $query->get();
 
-        return view('jadwal.shared', compact('jadwals', 'title', 'from', 'to', 'status'));
+        return view('dashboard.koordinator.jadwal.shared', compact('jadwals', 'title', 'from', 'to', 'status'));
     }
 
     public function import(Request $request)
@@ -426,22 +468,123 @@ class JadwalController extends Controller
         ]);
     }
 
-    public function autoPengujiByTanggal(Request $request, $skripsiId)
+    public function getAvailableSlots(Request $request, $skripsiId)
     {
-        $skripsi = Skripsi::with(['dosen1', 'dosen2'])->findOrFail($skripsiId);
+        $status = $request->query('status');
+        $skripsi = Skripsi::with(['dosen1', 'dosen2', 'penguji1', 'penguji2'])->findOrFail($skripsiId);
 
-        $mulai = $request->mulai;
-        $selesai = $request->selesai;
+        if (!$skripsi->dosen1 || !$skripsi->dosen2) {
+             return response()->json(['error' => 'Data pembimbing tidak lengkap', 'slots' => []]);
+        }
+        
+        $isSeminarHasil = ($status === 'Seminar Hasil' || $status === 'Sidang Akhir') && $skripsi->penguji1 && $skripsi->penguji2;
 
-        if (!$mulai || !$selesai) {
-            return response()->json(['error' => 'Tanggal & jam seminar belum lengkap'], 422);
+        $allDays = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+        $masterSlots = [
+            '08.00 - 08.50', '08.50 - 09.40', '09.40 - 10.30', '10.30 - 11.20', 
+            '11.20 - 12.10', '12.10 - 13.00', '13.00 - 14.00', '14.00 - 14.50', 
+            '14.50 - 15.30', '15.30 - 16.30', '16.30 - 17.20', '17.20 - 18.10'
+        ];
+
+        $validSlots = [];
+
+        foreach ($allDays as $hari) {
+            $slotsP1 = JadwalDosen::where('userId', $skripsi->dosen1->userId)
+                ->where('hari', $hari)
+                ->where('status', 'Kosong')
+                ->pluck('jam')->toArray();
+
+            $slotsP2 = JadwalDosen::where('userId', $skripsi->dosen2->userId)
+                ->where('hari', $hari)
+                ->where('status', 'Kosong')
+                ->pluck('jam')->toArray();
+
+            $commonSlots = array_values(array_intersect($slotsP1, $slotsP2));
+
+            if ($isSeminarHasil) {
+                $slotsPeng1 = JadwalDosen::where('userId', $skripsi->penguji1->userId)
+                    ->where('hari', $hari)->where('status', 'Kosong')->pluck('jam')->toArray();
+                $slotsPeng2 = JadwalDosen::where('userId', $skripsi->penguji2->userId)
+                    ->where('hari', $hari)->where('status', 'Kosong')->pluck('jam')->toArray();
+
+                $commonSlots = array_values(array_intersect($commonSlots, $slotsPeng1, $slotsPeng2));
+            }
+
+            $consecutivePairs = [];
+            for ($i = 0; $i < count($masterSlots) - 1; $i++) {
+                $slotA = $masterSlots[$i];
+                $slotB = $masterSlots[$i+1];
+                if (in_array($slotA, $commonSlots) && in_array($slotB, $commonSlots)) {
+                    $consecutivePairs[] = [$slotA, $slotB];
+                }
+            }
+
+            foreach ($consecutivePairs as $pair) {
+                if ($isSeminarHasil) {
+                    $jamMulai = explode(' - ', $pair[0])[0];
+                    $jamSelesai = explode(' - ', $pair[1])[1];
+                    $combinedJam = $jamMulai . ' - ' . $jamSelesai;
+
+                    $validSlots[] = [
+                        'hari' => $hari,
+                        'jam' => $combinedJam,
+                        'penguji1' => $skripsi->penguji1,
+                        'penguji2' => $skripsi->penguji2
+                    ];
+                } else {
+                    $otherDosensUserIdA = JadwalDosen::where('hari', $hari)
+                        ->where('jam', $pair[0])
+                        ->where('status', 'Kosong')
+                        ->whereNotIn('userId', [$skripsi->dosen1->userId, $skripsi->dosen2->userId])
+                        ->pluck('userId')->toArray();
+                    
+                    $otherDosensUserIdB = JadwalDosen::where('hari', $hari)
+                        ->where('jam', $pair[1])
+                        ->where('status', 'Kosong')
+                        ->whereNotIn('userId', [$skripsi->dosen1->userId, $skripsi->dosen2->userId])
+                        ->pluck('userId')->toArray();
+
+                    $validPengujiIds = array_values(array_intersect($otherDosensUserIdA, $otherDosensUserIdB));
+
+                    if (count($validPengujiIds) < 2) continue;
+
+                    $bidangDosens = Dosen::where('bidang', $skripsi->bidang)
+                        ->whereIn('userId', $validPengujiIds)
+                        ->get();
+                    
+                    $dosenLainIds = array_diff($validPengujiIds, $bidangDosens->pluck('userId')->toArray());
+                    $dosenLain = Dosen::whereIn('userId', $dosenLainIds)->get();
+
+                    $hasil = $bidangDosens->merge($dosenLain);
+
+                    if ($hasil->count() >= 2) {
+                        $jamMulai = explode(' - ', $pair[0])[0];
+                        $jamSelesai = explode(' - ', $pair[1])[1];
+                        $combinedJam = $jamMulai . ' - ' . $jamSelesai;
+
+                        $validSlots[] = [
+                            'hari' => $hari,
+                            'jam' => $combinedJam,
+                            'penguji1' => $hasil[0],
+                            'penguji2' => $hasil[1]
+                        ];
+                    }
+                }
+            }
         }
 
-        $hasil = $this->autoAssignPenguji($skripsi, $mulai, $selesai);
+        if (empty($validSlots)) {
+            $msg = $isSeminarHasil 
+                ? "Tidak ditemukan 2 jadwal beruntun kosong bersamaan untuk 4 Dosen (Pembimbing 1, Pembimbing 2, Penguji 1, Penguji 2)."
+                : "Tidak ditemukan 2 jadwal beruntun kosong bersamaan untuk Pembimbing 1, Pembimbing 2, beserta Penguji di minggu ini.";
+            return response()->json([
+                'slots' => [],
+                'error' => $msg
+            ]);
+        }
 
         return response()->json([
-            'penguji1' => Dosen::find($hasil['dosenId1']),
-            'penguji2' => Dosen::find($hasil['dosenId2']),
+            'slots' => $validSlots
         ]);
     }
 

@@ -48,34 +48,7 @@
 
             <!-- Main Content -->
             <main class="flex-1 overflow-auto p-8">
-                
-                @if(session('success'))
-                    <div class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
-                        <svg class="w-5 h-5 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <p class="text-sm text-green-800 font-medium">{{ session('success') }}</p>
-                    </div>
-                @endif
 
-                @if(session('error'))
-                    <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center">
-                        <svg class="w-5 h-5 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <p class="text-sm text-red-800 font-medium">{{ session('error') }}</p>
-                    </div>
-                @endif
-
-                @if($errors->any())
-                    <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-                        <div class="flex items-center mb-2">
-                            <svg class="w-5 h-5 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <p class="text-sm text-red-800 font-medium">Terdapat kesalahan pada isian form:</p>
-                        </div>
-                        <ul class="list-disc pl-10 text-sm text-red-700">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
 
                 <!-- Back Button -->
                 <div class="mb-6">
@@ -141,8 +114,12 @@
                             <button disabled class="w-full bg-gray-300 text-gray-500 font-medium py-2 px-4 rounded-lg cursor-not-allowed">
                                 Sudah Terdaftar
                             </button>
+                        @elseif(!$registrationStatus['seminar_proposal'] || $registrationStatus['seminar_proposal']->status != 'acc')
+                            <button disabled title="Selesaikan Seminar Proposal terlebih dahulu" class="w-full bg-gray-300 text-gray-500 font-medium py-2 px-4 rounded-lg cursor-not-allowed">
+                                Proposal Belum Selesai
+                            </button>
                         @else
-                            <button class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg transition" onclick="alert('Fitur pendaftaran dalam pengembangan')">
+                            <button class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg transition" onclick="document.getElementById('modal-seminar-hasil').classList.remove('hidden')">
                                 Daftar Sekarang
                             </button>
                         @endif
@@ -293,7 +270,189 @@
                                         Kirim
                                     </button>
                                     <button type="button" onclick="document.getElementById('modal-seminar-proposal').classList.add('hidden')" class="text-green-600 hover:text-green-800 font-medium text-sm transition">
-                                        Kosongkan formulir
+                                        Batal
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Pendaftaran Seminar Hasil -->
+                <div id="modal-seminar-hasil" class="hidden fixed inset-0 z-50 overflow-y-auto">
+                    <!-- Background overlay -->
+                    <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onclick="document.getElementById('modal-seminar-hasil').classList.add('hidden')"></div>
+
+                    <!-- Modal panel -->
+                    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
+                        <div class="relative bg-[#fdf5e6] rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-3xl w-full border border-gray-100">
+                            
+                            <!-- Header Form Style -->
+                            <div class="bg-white p-6 border-t-[10px] border-yellow-500 rounded-lg mx-6 mt-6 shadow-sm">
+                                <h2 class="text-3xl font-normal text-gray-900 mb-4">Pendaftaran Seminar Hasil</h2>
+                                <p class="text-sm text-gray-600 mb-2">Pastikan data skripsi yang diimpor dari kegiatan Seminar Proposal sudah sesuai, tekan tombol Edit (pensil) jika ada perubahan.</p>
+                            </div>
+
+                            <form action="{{ route('mahasiswa.daftar-seminar.hasil') }}" method="POST" enctype="multipart/form-data" class="bg-transparent p-6">
+                                @csrf
+                                <div class="space-y-6">
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="no_registrasi_hasil" class="block mb-4 font-medium text-gray-800">Nomor Registrasi <span class="text-red-500">*</span></label>
+                                        <input type="text" id="no_registrasi_hasil" name="no_registrasi" required class="w-1/2 border-0 border-b border-gray-300 bg-transparent px-0 py-2 focus:ring-0 focus:border-yellow-600 text-gray-900 border-dotted" placeholder="Jawaban Anda">
+                                    </div>
+
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="nip_hasil" class="block mb-4 font-medium text-gray-800">NIM <span class="text-red-500">*</span></label>
+                                        <input type="text" id="nip_hasil" name="nip" value="{{ $mahasiswa->nim ?? Auth::user()->nip }}" readonly required class="w-1/2 border-0 border-b border-gray-300 bg-transparent px-0 py-2 focus:ring-0 focus:border-yellow-600 text-gray-900 border-dotted" placeholder="Jawaban Anda">
+                                    </div>
+
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="nama_hasil" class="block mb-4 font-medium text-gray-800">Nama <span class="text-red-500">*</span></label>
+                                        <input type="text" id="nama_hasil" name="nama" value="{{ $mahasiswa->name ?? Auth::user()->name }}" readonly required class="w-1/2 border-0 border-b border-gray-300 bg-transparent px-0 py-2 focus:ring-0 focus:border-yellow-600 text-gray-900 border-dotted" placeholder="Jawaban Anda">
+                                    </div>
+
+                                    <!-- Pembimbing 1 with Edit toggle -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 relative group">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <label for="pembimbing_1_hasil" class="block font-medium text-gray-800">Pembimbing 1 <span class="text-red-500">*</span></label>
+                                            <button type="button" onclick="toggleEdit('pembimbing_1_hasil')" class="text-gray-400 hover:text-yellow-600" title="Edit Pembimbing 1">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                            </button>
+                                        </div>
+                                        <select id="pembimbing_1_hasil" name="pembimbing_1" required disabled class="w-1/3 border border-gray-300 bg-gray-100 text-gray-900 text-sm rounded-md focus:ring-yellow-500 focus:border-yellow-500 block p-2.5">
+                                            <option value="" disabled>Pilih</option>
+                                            @foreach($dosens as $dosen)
+                                                <option value="{{ $dosen->id }}" {{ isset($skripsi) && $skripsi->dosen_pembimbing_1 == $dosen->id ? 'selected' : '' }}>{{ $dosen->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <input type="hidden" name="pembimbing_1" id="pembimbing_1_hasil_hidden" value="{{ $skripsi->dosen_pembimbing_1 ?? '' }}">
+                                    </div>
+
+                                    <!-- Pembimbing 2 with Edit toggle -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 relative group">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <label for="pembimbing_2_hasil" class="block font-medium text-gray-800">Pembimbing 2 <span class="text-red-500">*</span></label>
+                                            <button type="button" onclick="toggleEdit('pembimbing_2_hasil')" class="text-gray-400 hover:text-yellow-600" title="Edit Pembimbing 2">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                            </button>
+                                        </div>
+                                        <select id="pembimbing_2_hasil" name="pembimbing_2" required disabled class="w-1/3 border border-gray-300 bg-gray-100 text-gray-900 text-sm rounded-md focus:ring-yellow-500 focus:border-yellow-500 block p-2.5">
+                                            <option value="" disabled>Pilih</option>
+                                            @foreach($dosens as $dosen)
+                                                <option value="{{ $dosen->id }}" {{ isset($skripsi) && $skripsi->dosen_pembimbing_2 == $dosen->id ? 'selected' : '' }}>{{ $dosen->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <input type="hidden" name="pembimbing_2" id="pembimbing_2_hasil_hidden" value="{{ $skripsi->dosen_pembimbing_2 ?? '' }}">
+                                    </div>
+
+                                    <!-- Penguji 1 with Edit toggle -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 relative group">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <label for="penguji_1_hasil" class="block font-medium text-gray-800">Penguji 1 <span class="text-red-500">*</span></label>
+                                            <button type="button" onclick="toggleEdit('penguji_1_hasil')" class="text-gray-400 hover:text-yellow-600" title="Edit Penguji 1">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                            </button>
+                                        </div>
+                                        <select id="penguji_1_hasil" name="penguji_1" required disabled class="w-1/3 border border-gray-300 bg-gray-100 text-gray-900 text-sm rounded-md focus:ring-yellow-500 focus:border-yellow-500 block p-2.5">
+                                            <option value="" disabled selected>Pilih</option>
+                                            @foreach($dosens as $dosen)
+                                                <option value="{{ $dosen->id }}" {{ (isset($skripsi) && $skripsi->dosen_penguji_1 == $dosen->id) || (isset($jadwalTerakhir) && $jadwalTerakhir->dosenId1 == $dosen->id) ? 'selected' : '' }}>{{ $dosen->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <input type="hidden" name="penguji_1" id="penguji_1_hasil_hidden" value="{{ $skripsi->dosen_penguji_1 ?? ($jadwalTerakhir->dosenId1 ?? '') }}">
+                                    </div>
+
+                                    <!-- Penguji 2 with Edit toggle -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 relative group">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <label for="penguji_2_hasil" class="block font-medium text-gray-800">Penguji 2 <span class="text-red-500">*</span></label>
+                                            <button type="button" onclick="toggleEdit('penguji_2_hasil')" class="text-gray-400 hover:text-yellow-600" title="Edit Penguji 2">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                            </button>
+                                        </div>
+                                        <select id="penguji_2_hasil" name="penguji_2" required disabled class="w-1/3 border border-gray-300 bg-gray-100 text-gray-900 text-sm rounded-md focus:ring-yellow-500 focus:border-yellow-500 block p-2.5">
+                                            <option value="" disabled selected>Pilih</option>
+                                            @foreach($dosens as $dosen)
+                                                <option value="{{ $dosen->id }}" {{ (isset($skripsi) && $skripsi->dosen_penguji_2 == $dosen->id) || (isset($jadwalTerakhir) && $jadwalTerakhir->dosenId2 == $dosen->id) ? 'selected' : '' }}>{{ $dosen->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <input type="hidden" name="penguji_2" id="penguji_2_hasil_hidden" value="{{ $skripsi->dosen_penguji_2 ?? ($jadwalTerakhir->dosenId2 ?? '') }}">
+                                    </div>
+
+                                    <!-- Judul Tugas Akhir with Edit toggle -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 relative group">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <label for="judul_skripsi_hasil" class="block font-medium text-gray-800">Judul Tugas Akhir (Draft Skripsi) <span class="text-red-500">*</span></label>
+                                            <button type="button" onclick="toggleEdit('judul_skripsi_hasil')" class="text-gray-400 hover:text-yellow-600" title="Edit Judul Skripsi">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                            </button>
+                                        </div>
+                                        <input type="text" id="judul_skripsi_hasil" name="judul_skripsi" value="{{ $skripsi->judul_skripsi ?? '' }}" readonly required class="w-full border-0 border-b border-gray-300 bg-transparent px-0 py-2 focus:ring-0 focus:border-yellow-600 text-gray-900 border-dotted" placeholder="Jawaban Anda">
+                                    </div>
+
+                                    <!-- Bidang -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="bidang_hasil" class="block mb-4 font-medium text-gray-800">Bidang <span class="text-red-500">*</span></label>
+                                        <div class="space-y-3">
+                                            <div class="flex items-center">
+                                                <input id="bidang-1" type="radio" value="Sistem Manufaktur" name="bidang" {{ (isset($skripsi) && $skripsi->bidang == 'Sistem Manufaktur') ? 'checked' : '' }} class="w-4 h-4 text-yellow-600 bg-gray-100 border-gray-300 focus:ring-yellow-500" required>
+                                                <label for="bidang-1" class="ml-2 text-sm font-medium text-gray-900">Sistem Manufaktur</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input id="bidang-2" type="radio" value="Sistem dan Manajemen Industri" name="bidang" {{ (isset($skripsi) && $skripsi->bidang == 'Sistem dan Manajemen Industri') ? 'checked' : '' }} class="w-4 h-4 text-yellow-600 bg-gray-100 border-gray-300 focus:ring-yellow-500">
+                                                <label for="bidang-2" class="ml-2 text-sm font-medium text-gray-900">Sistem dan Manajemen Industri</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input id="bidang-3" type="radio" value="Optimasi dan Sistem Informasi" name="bidang" {{ (isset($skripsi) && $skripsi->bidang == 'Optimasi dan Sistem Informasi') ? 'checked' : '' }} class="w-4 h-4 text-yellow-600 bg-gray-100 border-gray-300 focus:ring-yellow-500">
+                                                <label for="bidang-3" class="ml-2 text-sm font-medium text-gray-900">Optimasi dan Sistem Informasi</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- KRS -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="file_krs_hasil" class="block mb-2 font-medium text-gray-800">Upload KRS Terakhir <span class="text-red-500">*</span></label>
+                                        <p class="text-xs text-gray-500 mb-4">Upload 1 file yang didukung: PDF. Maks 10 MB.</p>
+                                        <div class="flex items-center space-x-2 border border-gray-300 rounded px-4 py-2 w-max cursor-pointer hover:bg-gray-50 text-yellow-600 font-medium text-sm bg-white" onclick="document.getElementById('file_krs_hasil').click()">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                            <span>Tambahkan file</span>
+                                        </div>
+                                        <input type="file" id="file_krs_hasil" name="file_krs" accept=".pdf" class="hidden">
+                                        <div id="file_krs_hasil_name" class="text-sm text-gray-600 mt-2"></div>
+                                    </div>
+
+                                    <!-- Persetujuan Seminar Hasil -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="file_persetujuan_hasil" class="block mb-2 font-medium text-gray-800">Upload Lembar Pengesahan <span class="text-red-500">*</span></label>
+                                        <p class="text-xs text-gray-500 mb-4">Upload 1 file yang didukung: PDF. Maks 10 MB.</p>
+                                        <div class="flex items-center space-x-2 border border-gray-300 rounded px-4 py-2 w-max cursor-pointer hover:bg-gray-50 text-blue-600 font-medium text-sm bg-white" onclick="document.getElementById('file_persetujuan_hasil').click()">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                            <span>Tambahkan file</span>
+                                        </div>
+                                        <input type="file" id="file_persetujuan_hasil" name="file_persetujuan_hasil" accept=".pdf" required class="hidden">
+                                        <div id="file_persetujuan_hasil_name" class="text-sm text-gray-600 mt-2"></div>
+                                    </div>
+
+                                    <!-- Draft Skripsi -->
+                                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                        <label for="file_draft_skripsi" class="block mb-2 font-medium text-gray-800">Upload Draft Skripsi (Lengkap) <span class="text-red-500">*</span></label>
+                                        <p class="text-xs text-gray-500 mb-4">Upload 1 file yang didukung: PDF. Maks 10 MB.</p>
+                                        <div class="flex items-center space-x-2 border border-gray-300 rounded px-4 py-2 w-max cursor-pointer hover:bg-gray-50 text-yellow-600 font-medium text-sm bg-white" onclick="document.getElementById('file_draft_skripsi').click()">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                            <span>Tambahkan file</span>
+                                        </div>
+                                        <input type="file" id="file_draft_skripsi" name="file_draft_skripsi" accept=".pdf" class="hidden">
+                                        <div id="file_draft_skripsi_name" class="text-sm text-gray-600 mt-2"></div>
+                                    </div>
+
+                                </div>
+
+                                <div class="mt-8 flex items-center justify-between">
+                                    <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-6 rounded transition focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2">
+                                        Kirim
+                                    </button>
+                                    <button type="button" onclick="document.getElementById('modal-seminar-hasil').classList.add('hidden')" class="text-red-600 hover:text-red-800 font-medium text-sm transition">
+                                        Batal
                                     </button>
                                 </div>
                             </form>
@@ -305,9 +464,67 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                timer: 3000,
+                showConfirmButton: false
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: "{{ session('error') }}"
+            });
+        @endif
+
+        @if($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Terdapat Kesalahan!',
+                html: `
+                    <ul class="text-left text-sm text-red-600 list-disc pl-5 space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                `
+            });
+        @endif
+
+        function toggleEdit(inputId) {
+            const el = document.getElementById(inputId);
+            if (el.tagName === 'SELECT') {
+                if (el.disabled) {
+                    el.disabled = false;
+                    el.classList.remove('bg-gray-100');
+                    document.getElementById(inputId + '_hidden').disabled = true; // disable hidden input so select takes over
+                    el.focus();
+                } else {
+                    el.disabled = true;
+                    el.classList.add('bg-gray-100');
+                    document.getElementById(inputId + '_hidden').disabled = false;
+                }
+            } else {
+                if (el.readOnly) {
+                    el.readOnly = false;
+                    el.classList.remove('border-dotted');
+                    el.focus();
+                } else {
+                    el.readOnly = true;
+                    el.classList.add('border-dotted');
+                }
+            }
+        }
+
         // Update file names when selected
-        ['file_krs', 'file_pengesahan', 'file_draft_proposal'].forEach(id => {
+        ['file_krs', 'file_pengesahan', 'file_draft_proposal', 'file_krs_hasil', 'file_persetujuan_hasil', 'file_draft_skripsi'].forEach(id => {
             const input = document.getElementById(id);
             if(input) {
                 input.addEventListener('change', function(e) {

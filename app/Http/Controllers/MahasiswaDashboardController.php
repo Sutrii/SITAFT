@@ -82,8 +82,10 @@ class MahasiswaDashboardController extends Controller
         }
 
         $dosens = \App\Models\Dosen::all();
+        $skripsi = $mahasiswa ? \App\Models\Skripsi::where('nama_mahasiswa', $mahasiswa->name)->first() : null;
+        $jadwalTerakhir = $skripsi ? \App\Models\Jadwal::where('skripsiId', $skripsi->id)->latest()->first() : null;
 
-        return view('dashboard.mahasiswa.daftar-seminar', compact('mahasiswa', 'registrationStatus', 'dosens'));
+        return view('dashboard.mahasiswa.daftar-seminar', compact('mahasiswa', 'registrationStatus', 'dosens', 'skripsi', 'jadwalTerakhir'));
     }
 
     /**
@@ -161,6 +163,90 @@ class MahasiswaDashboardController extends Controller
         ]);
 
         return back()->with('success', 'Pendaftaran seminar proposal berhasil disubmit.');
+    }
+
+    /**
+     * Store Seminar Hasil Registration
+     */
+    public function storeSeminarHasil(Request $request)
+    {
+        $request->validate([
+            'nip' => 'required',
+            'nama' => 'required',
+            'pembimbing_1' => 'required|exists:dosen,id',
+            'pembimbing_2' => 'required|exists:dosen,id',
+            'penguji_1' => 'required|exists:dosen,id',
+            'penguji_2' => 'required|exists:dosen,id',
+            'judul_skripsi' => 'required|string',
+            'bidang' => 'required|in:Sistem Manufaktur,Sistem dan Manajemen Industri,Optimasi dan Sistem Informasi',
+            'file_krs' => 'nullable|mimes:pdf|max:10240',
+            'file_persetujuan_hasil' => 'required|mimes:pdf|max:10240',
+            'file_draft_skripsi' => 'nullable|mimes:pdf|max:10240',
+            'no_hp' => 'nullable|string',
+            'no_registrasi' => 'required|string'
+        ]);
+
+        $user = Auth::user();
+        $mahasiswa = $user->mahasiswa;
+
+        if (!$mahasiswa) {
+            $mahasiswa = Mahasiswa::create([
+                'userId' => $user->id,
+                'name' => $request->nama,
+                'nim' => $request->nip,
+            ]);
+        } else {
+            $mahasiswa->update([
+                'name' => $request->nama,
+                'nim' => $request->nip,
+            ]);
+        }
+
+        $filePaths = [];
+        if ($request->hasFile('file_krs')) {
+            $filePaths['KRS'] = $request->file('file_krs')->store('persyaratan/krs', 'public');
+        }
+        if ($request->hasFile('file_persetujuan_hasil')) {
+            $filePaths['Lembar Persetujuan'] = $request->file('file_persetujuan_hasil')->store('persyaratan/persetujuan_hasil', 'public');
+        }
+        if ($request->hasFile('file_draft_skripsi')) {
+            $filePaths['Draft Skripsi'] = $request->file('file_draft_skripsi')->store('persyaratan/draft_skripsi', 'public');
+        }
+
+        // Create or Update Skripsi Data
+        $skripsi = Skripsi::firstOrCreate(
+            ['nama_mahasiswa' => $request->nama],
+            [
+                'judul_skripsi' => $request->judul_skripsi,
+                'bidang' => $request->bidang,
+                'dosen_pembimbing_1' => $request->pembimbing_1,
+                'dosen_pembimbing_2' => $request->pembimbing_2,
+                'dosen_penguji_1' => $request->penguji_1,
+                'dosen_penguji_2' => $request->penguji_2,
+            ]
+        );
+
+        $skripsi->update([
+            'judul_skripsi' => $request->judul_skripsi,
+            'bidang' => $request->bidang,
+            'dosen_pembimbing_1' => $request->pembimbing_1,
+            'dosen_pembimbing_2' => $request->pembimbing_2,
+            'dosen_penguji_1' => $request->penguji_1,
+            'dosen_penguji_2' => $request->penguji_2,
+        ]);
+
+        PendaftaranSeminar::updateOrCreate([
+            'mahasiswa_id' => $mahasiswa->id,
+            'jenis_seminar' => 'seminar_hasil',
+        ],[
+            'skripsi_id' => $skripsi->id,
+            'nomor_registrasi' => $request->no_registrasi,
+            'no_hp' => $request->no_hp,
+            'status' => 'pending',
+            'file_persyaratan' => json_encode($filePaths),
+        ]);
+
+        return back()->with('success', 'Pendaftaran seminar hasil berhasil disubmit.');
     }
 
     /**

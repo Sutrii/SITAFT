@@ -33,7 +33,7 @@ class DashboardController extends Controller
             Carbon::parse($j->jadwal_seminar)->day => $j->status
         ]);
 
-        return view('dashboard.index', compact('dosenKosong', 'jadwalSeminar', 'eventDays', 'currentMonth'));
+        return view('dashboard.koordinator.index', compact('dosenKosong', 'jadwalSeminar', 'eventDays', 'currentMonth'));
     }
 
     public function fetchMonth($month, $year)
