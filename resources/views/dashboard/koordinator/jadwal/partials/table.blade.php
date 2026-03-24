@@ -593,23 +593,6 @@ fetch(`/dosen/all`)
         selectPenguji1.val(data.penguji1.id);
         selectPenguji2.val(data.penguji2.id);
 
-        // Auto-calculate next matching Date for the Calendar
-        const dayMap = { 'Minggu': 0, 'Senin': 1, 'Selasa': 2, 'Rabu': 3, 'Kamis': 4, 'Jumat': 5, 'Sabtu': 6 };
-        const targetDay = dayMap[data.hari];
-        if (targetDay !== undefined && !$(tanggalInput).val()) {
-            const today = new Date();
-            let daysUntil = (targetDay + 7 - today.getDay()) % 7;
-            if (daysUntil === 0) daysUntil = 7; // If today, suggest next week
-            
-            const nextDate = new Date(today);
-            nextDate.setDate(today.getDate() + daysUntil);
-            
-            const yyyy = nextDate.getFullYear();
-            const mm = String(nextDate.getMonth() + 1).padStart(2, '0');
-            const dd = String(nextDate.getDate()).padStart(2, '0');
-            $(tanggalInput).val(`${yyyy}-${mm}-${dd}`);
-        }
-
         ['select[name="dosenId1"]', 'select[name="dosenId2"]'].forEach(sel => {
             const elm = $(this).closest('form').find(sel);
             elm.css('box-shadow', '0 0 8px rgba(62, 167, 106, 0.6)');
