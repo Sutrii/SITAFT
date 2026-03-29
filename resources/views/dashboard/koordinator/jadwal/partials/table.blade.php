@@ -579,15 +579,18 @@ fetch(`/dosen/all`)
         $(tanggalInput).data('expected-hari', data.hari);
         $(tanggalInput).prop('disabled', false).removeClass('bg-gray-100 cursor-not-allowed');
         
-        // Auto assign penguji
+        // Auto assign / filter penguji dropdowns
         const selectPenguji1 = $(this).closest('form').find('select[name="dosenId1"]');
         const selectPenguji2 = $(this).closest('form').find('select[name="dosenId2"]');
 
-        if (!selectPenguji1.find(`option[value="${data.penguji1.id}"]`).length) {
-            selectPenguji1.append(`<option value="${data.penguji1.id}">${data.penguji1.name}</option>`);
-        }
-        if (!selectPenguji2.find(`option[value="${data.penguji2.id}"]`).length) {
-            selectPenguji2.append(`<option value="${data.penguji2.id}">${data.penguji2.name}</option>`);
+        selectPenguji1.empty().append('<option value="">-- Pilih Dosen Penguji 1 --</option>');
+        selectPenguji2.empty().append('<option value="">-- Pilih Dosen Penguji 2 --</option>');
+
+        if (data.available_penguji && Array.isArray(data.available_penguji)) {
+            data.available_penguji.forEach(dosen => {
+                selectPenguji1.append(`<option value="${dosen.id}">${dosen.name}</option>`);
+                selectPenguji2.append(`<option value="${dosen.id}">${dosen.name}</option>`);
+            });
         }
 
         selectPenguji1.val(data.penguji1.id);

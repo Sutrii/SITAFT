@@ -147,7 +147,7 @@ class JadwalController extends Controller
         ])
         ->whereDate('jadwal_seminar', '>=', $from)
         ->whereDate('jadwal_seminar', '<=', $to)
-        ->orderBy('jadwal_seminar', 'asc');
+        ->orderBy('jadwal_seminar', 'desc');
 
         if ($status && $status !== 'all') {
             $query->where('status', $status);
@@ -529,7 +529,8 @@ class JadwalController extends Controller
                         'hari' => $hari,
                         'jam' => $combinedJam,
                         'penguji1' => $skripsi->penguji1,
-                        'penguji2' => $skripsi->penguji2
+                        'penguji2' => $skripsi->penguji2,
+                        'available_penguji' => collect([$skripsi->penguji1, $skripsi->penguji2])
                     ];
                 } else {
                     $otherDosensUserIdA = JadwalDosen::where('hari', $hari)
@@ -566,7 +567,8 @@ class JadwalController extends Controller
                             'hari' => $hari,
                             'jam' => $combinedJam,
                             'penguji1' => $hasil[0],
-                            'penguji2' => $hasil[1]
+                            'penguji2' => $hasil[1],
+                            'available_penguji' => $hasil
                         ];
                     }
                 }

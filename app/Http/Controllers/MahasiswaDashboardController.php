@@ -245,9 +245,103 @@ class MahasiswaDashboardController extends Controller
             'no_hp' => $request->no_hp,
             'status' => 'pending',
             'file_persyaratan' => json_encode($filePaths),
+            'catatan' => null,
         ]);
 
         return back()->with('success', 'Pendaftaran seminar hasil berhasil disubmit.');
+    }
+
+    /**
+     * Store seminar sidang akhir registration data
+     */
+    public function storeSidangAkhir(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required|string',
+            'nip' => 'required|string',
+            'pembimbing_1' => 'required|exists:dosen,id',
+            'pembimbing_2' => 'required|exists:dosen,id',
+            'penguji_1' => 'required|exists:dosen,id',
+            'penguji_2' => 'required|exists:dosen,id',
+            'judul_skripsi' => 'required|string',
+            'bidang' => 'required|exists:dosen,bidang',
+            'no_registrasi' => 'required|string',
+            'file_krs' => 'required|mimes:pdf|max:10240',
+            'file_transkrip' => 'required|mimes:pdf|max:10240',
+            'file_biodata' => 'required|mimes:pdf|max:10240',
+            'file_draft_skripsi' => 'required|mimes:pdf|max:10240',
+            'file_pengesahan' => 'required|mimes:pdf|max:10240',
+            'file_artikel' => 'required|mimes:pdf|max:10240',
+            'file_buku_kendali' => 'required|mimes:pdf|max:10240',
+        ]);
+
+        $user = Auth::user();
+        $mahasiswa = $user->mahasiswa;
+
+        if (!$mahasiswa) {
+            $mahasiswa = Mahasiswa::create([
+                'userId' => $user->id,
+                'name' => $request->nama,
+                'nim' => $request->nip,
+            ]);
+        } else {
+            $mahasiswa->update([
+                'name' => $request->nama,
+                'nim' => $request->nip,
+            ]);
+        }
+
+        $filePaths = [];
+        $requiredFiles = [
+            'KRS' => 'file_krs',
+            'Transkrip Akademik' => 'file_transkrip',
+            'Biodata' => 'file_biodata',
+            'Draft Skripsi' => 'file_draft_skripsi',
+            'Lembar Pengesahan' => 'file_pengesahan',
+            'Artikel Ilmiah' => 'file_artikel',
+            'Buku Kendali' => 'file_buku_kendali'
+        ];
+
+        foreach ($requiredFiles as $label => $inputName) {
+            if ($request->hasFile($inputName)) {
+                $filePaths[$label] = $request->file($inputName)->store('persyaratan/sidang_akhir', 'public');
+            }
+        }
+
+        // Create or Update Skripsi Data
+        $skripsi = Skripsi::firstOrCreate(
+            ['nama_mahasiswa' => $request->nama],
+            [
+                'judul_skripsi' => $request->judul_skripsi,
+                'bidang' => $request->bidang,
+                'dosen_pembimbing_1' => $request->pembimbing_1,
+                'dosen_pembimbing_2' => $request->pembimbing_2,
+                'dosen_penguji_1' => $request->penguji_1,
+                'dosen_penguji_2' => $request->penguji_2,
+            ]
+        );
+
+        $skripsi->update([
+            'judul_skripsi' => $request->judul_skripsi,
+            'bidang' => $request->bidang,
+            'dosen_pembimbing_1' => $request->pembimbing_1,
+            'dosen_pembimbing_2' => $request->pembimbing_2,
+            'dosen_penguji_1' => $request->penguji_1,
+            'dosen_penguji_2' => $request->penguji_2,
+        ]);
+
+        PendaftaranSeminar::updateOrCreate([
+            'mahasiswa_id' => $mahasiswa->id,
+            'jenis_seminar' => 'sidang_akhir',
+        ],[
+            'skripsi_id' => $skripsi->id,
+            'nomor_registrasi' => $request->no_registrasi,
+            'status' => 'pending',
+            'file_persyaratan' => json_encode($filePaths),
+            'catatan' => null,
+        ]);
+
+        return back()->with('success', 'Pendaftaran sidang akhir berhasil disubmit.');
     }
 
     /**

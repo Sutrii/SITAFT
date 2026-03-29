@@ -117,13 +117,13 @@
                 </select>
             </div>
 
-            <div id="emailPasswordAdd" class="hidden space-y-3">
-                <div id="nipFieldAdd" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
-                    <input type="text" name="nip"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none">
-                </div>
+            <div id="nipFieldAdd" class="hidden mb-3">
+                <label id="nipLabelAdd" class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
+                <input type="text" name="nip"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none">
+            </div>
 
+            <div id="emailPasswordAdd" class="hidden space-y-3">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                     <input type="email" name="email"
@@ -184,13 +184,13 @@
                 </select>
             </div>
 
-            <div id="emailPasswordEdit" class="hidden space-y-3">
-                <div id="nipFieldEdit" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
-                    <input type="text" name="nip" id="editNip"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none">
-                </div>
+            <div id="nipFieldEdit" class="hidden mb-3">
+                <label id="nipLabelEdit" class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
+                <input type="text" name="nip" id="editNip"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none">
+            </div>
 
+            <div id="emailPasswordEdit" class="hidden space-y-3">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                     <input type="email" name="email" id="editEmail"
@@ -293,7 +293,18 @@ function toggleEmailPassword(type) {
         type === 'add' ? 'nipFieldAdd' : 'nipFieldEdit'
     );
 
+    const nipLabel = document.getElementById(
+        type === 'add' ? 'nipLabelAdd' : 'nipLabelEdit'
+    );
+
     if (position === '1') {
+        nipLabel.innerText = 'NIP';
+        nipField.classList.remove('hidden');
+    } else if (position === '2') {
+        nipLabel.innerText = 'NIP/NIK';
+        nipField.classList.remove('hidden');
+    } else if (position === '3') {
+        nipLabel.innerText = 'NIM';
         nipField.classList.remove('hidden');
     } else {
         nipField.classList.add('hidden');

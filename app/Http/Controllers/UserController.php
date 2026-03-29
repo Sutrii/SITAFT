@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Dosen;
+use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -22,7 +24,7 @@ class UserController extends Controller
             'positionId' => 'required|in:1,2,3',
         ];
 
-        if ($request->positionId == 1) {
+        if (in_array($request->positionId, [1, 2, 3])) {
             $rules['nip'] = 'required|string|max:30|unique:users,nip';
         }
 
@@ -33,14 +35,28 @@ class UserController extends Controller
 
         $validated = $request->validate($rules);
 
-        User::create([
+        $user = User::create([
             'name' => $validated['name'],
             'nip' => $validated['nip'] ?? null,
             'email' => $validated['email'] ?? null,
-            'password' => $validated['password'] ?? null,
+            'password' => !empty($validated['password']) ? Hash::make($validated['password']) : null,
             'roleId' => $validated['roleId'],
             'positionId' => $validated['positionId'],
         ]);
+
+        if ($validated['positionId'] == 2) {
+            Dosen::create([
+                'userId' => $user->id,
+                'name' => $user->name,
+                'nik' => $user->nip,
+            ]);
+        } elseif ($validated['positionId'] == 3) {
+            Mahasiswa::create([
+                'userId' => $user->id,
+                'name' => $user->name,
+                'nim' => $user->nip,
+            ]);
+        }
 
         return back()->with('success', 'Pengguna berhasil ditambahkan!');
     }
@@ -53,7 +69,7 @@ class UserController extends Controller
             'positionId' => 'required|in:1,2,3',
         ];
 
-        if ($request->positionId == 1) {
+        if (in_array($request->positionId, [1, 2, 3])) {
             $rules['nip'] = 'required|string|max:30|unique:users,nip,' . $user->id;
         }
 
@@ -75,10 +91,22 @@ class UserController extends Controller
         ];
 
         if (!empty($validated['password'])) {
-            $updateData['password'] = $validated['password'];
+            $updateData['password'] = Hash::make($validated['password']);
         }
 
         $user->update($updateData);
+
+        if ($validated['positionId'] == 2) {
+            Dosen::updateOrCreate(
+                ['userId' => $user->id],
+                ['name' => $user->name, 'nik' => $user->nip]
+            );
+        } elseif ($validated['positionId'] == 3) {
+            Mahasiswa::updateOrCreate(
+                ['userId' => $user->id],
+                ['name' => $user->name, 'nim' => $user->nip]
+            );
+        }
 
         return back()->with('success', 'Data pengguna berhasil diubah!');
     }
