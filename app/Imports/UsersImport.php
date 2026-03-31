@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Models\User;
 use App\Models\Dosen;
 use App\Models\Mahasiswa;
+use App\Models\Koordinator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -66,6 +67,11 @@ class UsersImport implements ToCollection, WithHeadingRow
                 Mahasiswa::updateOrCreate(
                     ['userId' => $user->id],
                     ['name' => $user->name, 'nim' => $user->nip]
+                );
+            } elseif ($positionId == 1) {
+                Koordinator::updateOrCreate(
+                    ['userId' => $user->id],
+                    ['name' => $user->name, 'nip' => $user->nip]
                 );
             }
         }

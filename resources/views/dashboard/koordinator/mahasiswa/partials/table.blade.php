@@ -48,13 +48,13 @@
                         <div class="flex justify-center gap-3">
                             {{-- Tombol Edit --}}
                             <button type="button" class="text-blue-500 hover:text-blue-700 transition"
-                                onclick="openEditModal('{{ $mhs->id }}', '{{ $mhs->name }}', '{{ $mhs->nim }}')">
+                                onclick="openEditModal('{{ $mhs->userId }}', '{{ $mhs->name }}', '{{ $mhs->nim }}')">
                                 ✏️
                             </button>
 
                             {{-- Tombol Hapus --}}
                             <button type="button" class="text-red-500 hover:text-red-700 transition"
-                                onclick="confirmDelete('{{ route('koordinator.mahasiswa.destroy', $mhs->id) }}', '{{ $mhs->name }}')">
+                                onclick="confirmDelete('{{ route('koordinator.users.destroy', $mhs->userId) }}', '{{ $mhs->name }}')">
                                 🗑️
                             </button>
                         </div>
@@ -82,8 +82,10 @@
         </div>
 
         {{-- Form --}}
-        <form action="{{ route('koordinator.mahasiswa.store') }}" method="POST" class="p-5 space-y-4">
+        <form action="{{ route('koordinator.users.store') }}" method="POST" class="p-5 space-y-4">
             @csrf
+            <input type="hidden" name="roleId" value="1">
+            <input type="hidden" name="positionId" value="3">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Mahasiswa</label>
                 <input type="text" name="name" required
@@ -92,7 +94,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">NIM</label>
-                <input type="text" name="nim" required
+                <input type="text" name="nip" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400">
             </div>
 
@@ -116,6 +118,8 @@
         <form id="editForm" method="POST" class="p-5 space-y-4">
             @csrf
             @method('PUT')
+            <input type="hidden" name="roleId" value="1">
+            <input type="hidden" name="positionId" value="3">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Mahasiswa</label>
                 <input type="text" name="name" id="editName" required
@@ -124,7 +128,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">NIM</label>
-                <input type="text" name="nim" id="editNim" required
+                <input type="text" name="nip" id="editNim" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400">
             </div>
 
@@ -245,7 +249,7 @@ function openEditModal(id, name, nim) {
             editModal.classList.add('flex');
             document.getElementById('editName').value = name;
             document.getElementById('editNim').value = nim;
-            editForm.action = `/dashboard/koordinator/mahasiswa/${id}`;
+            editForm.action = `/dashboard/koordinator/users/${id}`;
         }
     });
 }

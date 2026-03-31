@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Dosen;
 use App\Models\Mahasiswa;
+use App\Models\Koordinator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
@@ -32,8 +33,8 @@ class UserController extends Controller
         }
 
         if ($request->positionId == 1 || ($request->roleId == 1 && $request->positionId == 3)) {
-            $rules['email'] = 'required|email|unique:users,email';
-            $rules['password'] = 'required|min:6';
+            $rules['email'] = 'nullable|email|unique:users,email';
+            $rules['password'] = 'nullable|min:6';
         }
 
         $validated = $request->validate($rules);
@@ -41,8 +42,8 @@ class UserController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'nip' => $validated['nip'] ?? null,
-            'email' => $validated['email'] ?? null,
-            'password' => !empty($validated['password']) ? Hash::make($validated['password']) : null,
+            'email' => !empty($validated['email']) ? $validated['email'] : ($validated['nip'] . '@sitaft.local'),
+            'password' => !empty($validated['password']) ? Hash::make($validated['password']) : Hash::make($validated['nip']),
             'roleId' => $validated['roleId'],
             'positionId' => $validated['positionId'],
         ]);
@@ -52,12 +53,19 @@ class UserController extends Controller
                 'userId' => $user->id,
                 'name' => $user->name,
                 'nik' => $user->nip,
+                'bidang' => $request->bidang ?? '-',
             ]);
         } elseif ($validated['positionId'] == 3) {
             Mahasiswa::create([
                 'userId' => $user->id,
                 'name' => $user->name,
                 'nim' => $user->nip,
+            ]);
+        } elseif ($validated['positionId'] == 1) {
+            Koordinator::create([
+                'userId' => $user->id,
+                'name' => $user->name,
+                'nip' => $user->nip,
             ]);
         }
 
@@ -77,9 +85,9 @@ class UserController extends Controller
         }
 
         if ($request->positionId == 1 || ($request->roleId == 1 && $request->positionId == 3)) {
-            $rules['email'] = 'required|email|unique:users,email,' . $user->id;
+            $rules['email'] = 'nullable|email|unique:users,email,' . $user->id;
             if ($request->filled('password')) {
-                $rules['password'] = 'min:6';
+                $rules['password'] = 'nullable|min:6';
             }
         }
 
@@ -87,11 +95,17 @@ class UserController extends Controller
 
         $updateData = [
             'name' => $validated['name'],
-            'nip' => $validated['nip'] ?? null,
-            'email' => $validated['email'] ?? null,
             'roleId' => $validated['roleId'],
             'positionId' => $validated['positionId'],
         ];
+
+        if (!empty($validated['nip'])) {
+            $updateData['nip'] = $validated['nip'];
+        }
+
+        if (!empty($validated['email'])) {
+            $updateData['email'] = $validated['email'];
+        }
 
         if (!empty($validated['password'])) {
             $updateData['password'] = Hash::make($validated['password']);
@@ -100,14 +114,23 @@ class UserController extends Controller
         $user->update($updateData);
 
         if ($validated['positionId'] == 2) {
+            $dosenData = ['name' => $user->name, 'nik' => $user->nip];
+            if ($request->has('bidang')) {
+                $dosenData['bidang'] = $request->bidang;
+            }
             Dosen::updateOrCreate(
                 ['userId' => $user->id],
-                ['name' => $user->name, 'nik' => $user->nip]
+                $dosenData
             );
         } elseif ($validated['positionId'] == 3) {
             Mahasiswa::updateOrCreate(
                 ['userId' => $user->id],
                 ['name' => $user->name, 'nim' => $user->nip]
+            );
+        } elseif ($validated['positionId'] == 1) {
+            Koordinator::updateOrCreate(
+                ['userId' => $user->id],
+                ['name' => $user->name, 'nip' => $user->nip]
             );
         }
 

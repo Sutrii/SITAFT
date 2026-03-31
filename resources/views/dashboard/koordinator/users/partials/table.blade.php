@@ -67,7 +67,7 @@
                         <div class="flex justify-center gap-3">
                             {{-- Tombol Edit --}}
                             <button type="button" class="text-blue-500 hover:text-blue-700 transition"
-                                onclick="openEditModal('{{ $user->id }}', '{{ $user->name }}', '{{ $user->email ?? '' }}', '{{ $user->roleId }}', '{{ $user->positionId }}')">
+                                onclick="openEditModal('{{ $user->id }}', '{{ $user->name }}', '{{ $user->email ?? '' }}', '{{ $user->nip ?? '' }}', '{{ $user->roleId }}', '{{ $user->positionId }}')">
                                 ✏️
                             </button>
 
@@ -398,7 +398,7 @@ const editModal = document.getElementById('editModal');
 const closeEditModalBtn = document.getElementById('closeEditModalBtn');
 const editForm = document.getElementById('editForm');
 
-function openEditModal(id, name, email, roleId, positionId) {
+function openEditModal(id, name, email, nip, roleId, positionId) {
     Swal.fire({
         title: `Edit ${name}?`,
         text: "Apakah Anda yakin ingin mengubah data ini?",
@@ -414,6 +414,7 @@ function openEditModal(id, name, email, roleId, positionId) {
             editModal.classList.add('flex');
             document.getElementById('editName').value = name;
             document.getElementById('editEmail').value = email;
+            document.getElementById('editNip').value = nip;
             document.getElementById('editRole').value = roleId;
             document.getElementById('editPosition').value = positionId;
             toggleEmailPassword('edit', positionId);

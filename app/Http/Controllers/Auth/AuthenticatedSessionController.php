@@ -33,7 +33,7 @@ class AuthenticatedSessionController extends Controller
                 Auth::guard('web')->logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
-                return redirect()->route('login')->withErrors(['email' => 'Akun Mahasiswa tidak valid/ditemukan.']);
+                return redirect()->route('login')->withErrors(['username' => 'Akun Mahasiswa tidak valid/ditemukan.']);
             }
             return redirect()->intended('/dashboard/mahasiswa');
         }
@@ -44,7 +44,7 @@ class AuthenticatedSessionController extends Controller
                 Auth::guard('web')->logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
-                return redirect()->route('login')->withErrors(['email' => 'Akun Koordinator belum diverifikasi di sistem.']);
+                return redirect()->route('login')->withErrors(['username' => 'Akun Koordinator belum diverifikasi di sistem (Profil tidak lengkap).']);
             }
             return redirect()->intended('/dashboard/koordinator');
         }

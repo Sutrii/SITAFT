@@ -48,11 +48,11 @@
                     <td class="text-center">
                         <div class="flex justify-center gap-3">
                             <button type="button" class="text-blue-500 hover:text-blue-700 transition"
-                                onclick="openEditModal('{{ $dsn->id }}', '{{ $dsn->name }}', '{{ $dsn->nik }}', '{{ $dsn->bidang }}')">
+                                onclick="openEditModal('{{ $dsn->userId }}', '{{ $dsn->name }}', '{{ $dsn->nik }}', '{{ $dsn->bidang }}')">
                                 ✏️
                             </button>
                             <button type="button" class="text-red-500 hover:text-red-700 transition"
-                                onclick="confirmDelete('{{ route('koordinator.dosen.destroy', $dsn->id) }}', '{{ $dsn->nik }}')">
+                                onclick="confirmDelete('{{ route('koordinator.users.destroy', $dsn->userId) }}', '{{ $dsn->nik }}')">
                                 🗑️
                             </button>
                         </div>
@@ -74,8 +74,10 @@
             Tambah Dosen
         </div>
 
-        <form action="{{ route('koordinator.dosen.store') }}" method="POST" class="p-5 space-y-4">
+        <form action="{{ route('koordinator.users.store') }}" method="POST" class="p-5 space-y-4">
             @csrf
+            <input type="hidden" name="roleId" value="1">
+            <input type="hidden" name="positionId" value="2">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Dosen</label>
                 <input type="text" name="name" required
@@ -84,7 +86,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
-                <input type="text" name="nik" required
+                <input type="text" name="nip" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none">
             </div>
 
@@ -114,7 +116,8 @@
         <form id="editForm" method="POST" class="p-5 space-y-4">
             @csrf
             @method('PUT')
-
+            <input type="hidden" name="roleId" value="1">
+            <input type="hidden" name="positionId" value="2">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Dosen</label>
                 <input type="text" name="name" id="editName" required
@@ -123,7 +126,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
-                <input type="text" name="nik" id="editNik" required
+                <input type="text" name="nip" id="editNik" required
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none">
             </div>
 
@@ -218,7 +221,7 @@ function openEditModal(id, name, nik, bidang) {
             document.getElementById('editName').value = name;
             document.getElementById('editNik').value = nik;
             document.getElementById('editBidang').value = bidang;
-            editForm.action = `/dashboard/koordinator/data-dosen/${id}`;
+            editForm.action = `/dashboard/koordinator/users/${id}`;
         }
     });
 }
