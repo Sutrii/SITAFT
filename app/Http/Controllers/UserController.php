@@ -7,6 +7,9 @@ use App\Models\Dosen;
 use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\UsersImport;
+use App\Exports\UsersTemplateExport;
 
 class UserController extends Controller
 {
@@ -119,6 +122,25 @@ class UserController extends Controller
             return redirect()->back()->with('success', 'Data pengguna berhasil dihapus!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus data pengguna!');
+        }
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new UsersTemplateExport, 'Template_Import_Pengguna.xlsx');
+    }
+
+    public function importExcel(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
+        ]);
+
+        try {
+            Excel::import(new UsersImport, $request->file('file'));
+            return back()->with('success', 'Data pengguna massal berhasil diimpor!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
         }
     }
 }

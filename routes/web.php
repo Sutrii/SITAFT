@@ -100,6 +100,8 @@ Route::middleware(['auth', 'verified', 'role:koordinator'])->prefix('dashboard/k
 
     // Data Pengguna
     Route::get('/users', [UserController::class, 'index'])->name('users');
+    Route::get('/users/download-template', [UserController::class, 'downloadTemplate'])->name('users.download-template');
+    Route::post('/users/import', [UserController::class, 'importExcel'])->name('users.import');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');

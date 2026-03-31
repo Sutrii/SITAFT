@@ -17,11 +17,20 @@
             </select>
         </div>
 
-        <div class="w-full flex justify-end"><button id="openModalBtn"
-            class="bg-[#3ea76a] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#2d8c5d] transition">
-            + Tambah Pengguna
-        </button>
-</div>
+        <div class="w-full flex justify-end items-center space-x-2">
+            <a href="{{ route('koordinator.users.download-template') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg> Download Template
+            </a>
+            <button id="openImportModalBtn" class="bg-yellow-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-yellow-600 transition">
+                Import Excel
+            </button>
+            <button id="openModalBtn"
+                class="bg-[#3ea76a] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#2d8c5d] transition">
+                + Tambah Pengguna
+            </button>
+        </div>
     </div>
 </div>
 
@@ -213,6 +222,39 @@
     </div>
 </div>
 
+<div id="importModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transform scale-95 transition-transform duration-300">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-xl font-bold text-gray-800">Import Massal Pengguna</h3>
+            <button id="closeImportModalBtn" class="text-gray-400 hover:text-red-500 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <form action="{{ route('koordinator.users.import') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Pilih File Excel (.xlsx, .xls, .csv)</label>
+                <input type="file" name="file" accept=".xlsx,.xls,.csv" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-500 focus:outline-none" />
+                <p class="text-xs text-gray-500 mt-2">Pastikan isian file sesuai dengan format Header dan Data pada <strong>Template yang diunduh</strong>. <i>(Role: Viewer/Admin | Posisi: Mahasiswa/Dosen/Koordinator)</i></p>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button type="button" id="cancelImportBtn"
+                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition">
+                    Batal
+                </button>
+                <button type="submit"
+                    class="px-4 py-2 bg-yellow-500 text-white rounded-lg text-sm font-medium shadow-sm shadow-yellow-500/30 hover:bg-yellow-600 transition"
+                    onclick="this.innerText='Mengunggah...'; this.classList.add('opacity-70');">
+                    Mulai Import
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- CDN -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -238,6 +280,36 @@ addModal.addEventListener('click', (e) => {
     if (e.target === addModal) {
         addModal.classList.add('hidden', 'opacity-0');
         addModal.classList.remove('flex');
+    }
+});
+
+const importModal = document.getElementById('importModal');
+const openImportModalBtn = document.getElementById('openImportModalBtn');
+const closeImportModalBtn = document.getElementById('closeImportModalBtn');
+const cancelImportBtn = document.getElementById('cancelImportBtn');
+
+openImportModalBtn?.addEventListener('click', () => {
+    importModal.classList.remove('hidden', 'opacity-0');
+    importModal.classList.add('flex');
+    setTimeout(() => {
+        importModal.querySelector('div').classList.remove('scale-95');
+    }, 10);
+});
+
+[closeImportModalBtn, cancelImportBtn].forEach(btn => {
+    btn?.addEventListener('click', () => {
+        importModal.classList.add('opacity-0');
+        importModal.querySelector('div').classList.add('scale-95');
+        setTimeout(() => {
+            importModal.classList.add('hidden');
+            importModal.classList.remove('flex');
+        }, 300);
+    });
+});
+
+importModal?.addEventListener('click', (e) => {
+    if (e.target === importModal) {
+        cancelImportBtn.click();
     }
 });
 
