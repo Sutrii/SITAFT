@@ -314,7 +314,7 @@
                     </a>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <!-- Seminar Proposal Status -->
                     <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-blue-500 hover:shadow-lg transition">
                         <div class="flex items-center justify-between mb-4">
@@ -478,6 +478,37 @@
                         @else
                             <button class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition" onclick="document.getElementById('modal-sidang-akhir').classList.remove('hidden')">
                                 Daftar Sekarang
+                            </button>
+                        @endif
+                    </div>
+
+                    <!-- Upload Skripsi Final Status -->
+                    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-purple-500 hover:shadow-lg transition">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Upload Skripsi</h3>
+                                @php $sidangStatus = $registrationStatus['sidang_akhir']; @endphp
+                                @if($sidangStatus && $sidangStatus->status == 'acc')
+                                    <p class="text-green-600 text-sm font-medium mt-1">Tersedia</p>
+                                @else
+                                    <p class="text-gray-500 text-sm mt-1">Belum Tersedia</p>
+                                @endif
+                            </div>
+                            <div class="text-purple-500 bg-purple-50 p-3 rounded-full">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-6 h-10">Upload dokumen skripsi final ke Google Form setelah selesai sidang akhir.</p>
+                        
+                        @if($sidangStatus && $sidangStatus->status == 'acc')
+                            <a href="https://docs.google.com/forms/d/1Xzt_bZ8t9aDRGX61itwfmVK6_ftMEytkSevwh7wSFd0/edit" target="_blank" class="block w-full text-center bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition">
+                                Upload Sekarang
+                            </a>
+                        @else
+                            <button disabled class="w-full bg-gray-300 text-gray-500 font-medium py-2 px-4 rounded-lg cursor-not-allowed">
+                                Belum Sidang Akhir
                             </button>
                         @endif
                     </div>
